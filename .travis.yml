@@ -1,0 +1,12 @@
+language: java
+
+jdk:
+  - oraclejdk11
+  - openjdk11
+
+os:
+  - linux
+
+cache:
+  directories:
+    - $HOME/.m2

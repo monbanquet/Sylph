@@ -1,0 +1,9 @@
+.idea
+*.log.*
+**/*.iml
+**/.project
+**/.classpath
+**/.settings
+**/.vscode/**
+**/target/
+release.properties
