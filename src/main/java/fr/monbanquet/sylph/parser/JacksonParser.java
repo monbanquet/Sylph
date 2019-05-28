@@ -35,6 +35,7 @@ import fr.monbanquet.sylph.SylphException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 public class JacksonParser implements Parser {
 
@@ -59,6 +60,7 @@ public class JacksonParser implements Parser {
     @Override
     public <T> T deserialize(String input, Class<T> returnType) {
         try {
+            if (isEmpty(input)) return null;
             return objectMapper.readValue(input, returnType);
         } catch (IOException e) {
             throw new SylphException(e);
@@ -68,6 +70,7 @@ public class JacksonParser implements Parser {
     @Override
     public <T> List<T> deserializeList(String input, Class<T> returnType) {
         try {
+            if (isEmpty(input)) return null;
             JavaType valueType = TypeFactory.defaultInstance().constructParametricType(
                     List.class,
                     returnType);
@@ -75,6 +78,10 @@ public class JacksonParser implements Parser {
         } catch (IOException e) {
             throw new SylphException(e);
         }
+    }
+
+    private boolean isEmpty(String input) {
+        return Objects.isNull(input) || "".equals(input.trim());
     }
 
 }

@@ -31,13 +31,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-public abstract class AbstractParserTest {
+abstract class AbstractParserTest {
 
     private final List<TodoExtended> todoList;
     private final TodoExtended todo;
@@ -45,7 +47,7 @@ public abstract class AbstractParserTest {
     private final String json;
     private final String jsonList;
 
-    public AbstractParserTest() {
+    AbstractParserTest() {
         todoList = IntStream.range(1, 1000)
                 .mapToObj(Helper::newTodoExtended)
                 .collect(Collectors.toList());
@@ -275,7 +277,7 @@ public abstract class AbstractParserTest {
     @Test
     void serializeDateTime() {
         // given
-        LocalDate date = LocalDate.of(2019, 02, 24);
+        LocalDate date = LocalDate.of(2019, 2, 24);
         LocalTime time = LocalTime.of(11, 42, 9).withNano(145);
         LocalDateTime dateTime = LocalDateTime.of(date, time);
         String dateStringExpected = "2019-02-24";
@@ -333,6 +335,30 @@ public abstract class AbstractParserTest {
         assertEquals(dateRes.getDate(), dateExpected);
         assertEquals(timeRes.getTime(), timeExpected);
         assertEquals(dateTimeRes.getDateTime(), dateTimeExpected);
+    }
+
+    @Test
+    void deserialize_empty() {
+        // given
+        String body = "";
+
+        // when
+        String deserialize = getParser().deserialize(body, String.class);
+
+        // then
+        assertNull(deserialize);
+    }
+
+    @Test
+    void deserializeList_empty() {
+        // given
+        String body = "";
+
+        // when
+        List<String> deserialize = getParser().deserializeList(body, String.class);
+
+        // then
+        assertNull(deserialize);
     }
 
 
