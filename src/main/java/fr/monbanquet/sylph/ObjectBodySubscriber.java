@@ -33,7 +33,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Flow;
 
-public class ObjectBodySubscriber<T> implements HttpResponse.BodySubscriber<T> {
+public class ObjectBodySubscriber<T> implements HttpResponse.BodySubscriber<T>, RawBodySubscriber {
 
     private final HttpResponse.BodySubscriber<String> subscriber;
     private final Class<T> returnType;
@@ -46,6 +46,11 @@ public class ObjectBodySubscriber<T> implements HttpResponse.BodySubscriber<T> {
         this.subscriber = HttpResponse.BodySubscribers.ofString(charset);
         this.returnType = returnType;
         this.parser = parser;
+    }
+
+    @Override
+    public String getStringBody() {
+        return subscriber.getBody().toString();
     }
 
     @Override
@@ -73,4 +78,5 @@ public class ObjectBodySubscriber<T> implements HttpResponse.BodySubscriber<T> {
     public void onComplete() {
         subscriber.onComplete();
     }
+
 }

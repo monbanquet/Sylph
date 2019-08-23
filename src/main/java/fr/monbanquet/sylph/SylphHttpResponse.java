@@ -101,6 +101,11 @@ public class SylphHttpResponse<T> implements HttpResponse<T> {
     }
 
     @Override
+    public T body() {
+        return response.body();
+    }
+
+    @Override
     public Optional<SSLSession> sslSession() {
         return response.sslSession();
     }
