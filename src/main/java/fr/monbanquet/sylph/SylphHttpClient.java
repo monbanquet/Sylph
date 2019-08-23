@@ -231,7 +231,13 @@ public class SylphHttpClient extends HttpClient {
         return httpClient.sendAsync(request, responseBodyHandler)
                 .thenApply(response -> responseLogger.log(response))
                 .thenApply(response -> responseProcessor.processResponse(response))
-                .thenApply(SylphHttpResponse::new);
+                .thenApply(SylphHttpResponse::new)
+                .exceptionally(t -> {
+                    throw new SylphHttpRequestException(
+                            request.uri().toString(),
+                            request.method(),
+                            t);
+                });
     }
 
     // ---  --- //
@@ -253,7 +259,8 @@ public class SylphHttpClient extends HttpClient {
     }
 
     public CompletableFuture<Void> bodyAsync() {
-        return sendAsync().thenAccept(r -> {});
+        return sendAsync().thenAccept(r -> {
+        });
     }
 
     // ---  --- //
