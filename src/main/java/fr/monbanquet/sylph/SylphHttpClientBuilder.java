@@ -23,6 +23,7 @@
  */
 package fr.monbanquet.sylph;
 
+import fr.monbanquet.sylph.delegate.HttpClientBuilderDelegate;
 import fr.monbanquet.sylph.logger.ResponseLogger;
 import fr.monbanquet.sylph.parser.Parser;
 import fr.monbanquet.sylph.processor.ResponseProcessor;
@@ -37,7 +38,7 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 
-public class SylphHttpClientBuilder implements HttpClient.Builder {
+public class SylphHttpClientBuilder extends HttpClientBuilderDelegate {
 
     private SylphHttpRequestBuilder baseRequest;
     private Parser parser;
@@ -80,9 +81,7 @@ public class SylphHttpClientBuilder implements HttpClient.Builder {
         this.responseProcessor = responseProcessor;
     }
 
-    // --- Delegate HttpClient.Builder --- //
-
-    private HttpClient.Builder builder = HttpClient.newBuilder();
+    // ---  --- //
 
     @Override
     public SylphHttpClientBuilder cookieHandler(CookieHandler cookieHandler) {

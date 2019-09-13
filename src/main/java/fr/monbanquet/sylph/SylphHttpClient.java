@@ -23,30 +23,23 @@
  */
 package fr.monbanquet.sylph;
 
+import fr.monbanquet.sylph.delegate.HttpClientDelegate;
+import fr.monbanquet.sylph.exception.SylphHttpRequestException;
 import fr.monbanquet.sylph.logger.ResponseLogger;
 import fr.monbanquet.sylph.parser.Parser;
 import fr.monbanquet.sylph.processor.ResponseProcessor;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLParameters;
-import java.net.Authenticator;
-import java.net.CookieHandler;
-import java.net.ProxySelector;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.WebSocket;
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
-public class SylphHttpClient extends HttpClient {
+public class SylphHttpClient extends HttpClientDelegate {
 
     private SylphHttpRequestBuilder baseRequest;
-    private HttpClient httpClient;
     private Parser parser;
     private ResponseLogger responseLogger;
     private ResponseProcessor responseProcessor;
@@ -282,60 +275,4 @@ public class SylphHttpClient extends HttpClient {
         this.responseProcessor = responseProcessor;
     }
 
-    // --- Delegate HttpClient --- //
-
-    @Override
-    public Optional<CookieHandler> cookieHandler() {
-        return httpClient.cookieHandler();
-    }
-
-    @Override
-    public Optional<Duration> connectTimeout() {
-        return httpClient.connectTimeout();
-    }
-
-    @Override
-    public Redirect followRedirects() {
-        return httpClient.followRedirects();
-    }
-
-    @Override
-    public Optional<ProxySelector> proxy() {
-        return httpClient.proxy();
-    }
-
-    @Override
-    public SSLContext sslContext() {
-        return httpClient.sslContext();
-    }
-
-    @Override
-    public SSLParameters sslParameters() {
-        return httpClient.sslParameters();
-    }
-
-    @Override
-    public Optional<Authenticator> authenticator() {
-        return httpClient.authenticator();
-    }
-
-    @Override
-    public Version version() {
-        return httpClient.version();
-    }
-
-    @Override
-    public Optional<Executor> executor() {
-        return httpClient.executor();
-    }
-
-    @Override
-    public <T> CompletableFuture<HttpResponse<T>> sendAsync(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler, HttpResponse.PushPromiseHandler<T> pushPromiseHandler) {
-        return httpClient.sendAsync(request, responseBodyHandler, pushPromiseHandler);
-    }
-
-    @Override
-    public WebSocket.Builder newWebSocketBuilder() {
-        return httpClient.newWebSocketBuilder();
-    }
 }

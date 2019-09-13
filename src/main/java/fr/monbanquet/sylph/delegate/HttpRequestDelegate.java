@@ -21,34 +21,59 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.monbanquet.sylph;
+package fr.monbanquet.sylph.delegate;
 
-import java.text.MessageFormat;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
+import java.net.http.HttpRequest;
+import java.time.Duration;
+import java.util.Optional;
 
-public class SylphHttpRequestException extends SylphException {
+public class HttpRequestDelegate extends HttpRequest {
 
-    private static final long serialVersionUID = 1L;
+    protected HttpRequest request;
 
-    private final String requestUri;
-    private final String requestMethod;
+    public static Builder newBuilder(URI uri) {
+        return HttpRequest.newBuilder(uri);
+    }
 
-    public SylphHttpRequestException(String requestUri, String requestMethod, Exception e) {
-        super(e);
-        this.requestUri = requestUri;
-        this.requestMethod = requestMethod;
+    public static Builder newBuilder() {
+        return HttpRequest.newBuilder();
     }
 
     @Override
-    public String getMessage() {
-        return MessageFormat.format("Error while executing call {0};{1} : error={2}",
-                requestMethod, requestUri, super.getMessage());
+    public Optional<BodyPublisher> bodyPublisher() {
+        return request.bodyPublisher();
     }
 
-    public String getRequestUri() {
-        return requestUri;
+    @Override
+    public String method() {
+        return request.method();
     }
 
-    public String getRequestMethod() {
-        return requestMethod;
+    @Override
+    public Optional<Duration> timeout() {
+        return request.timeout();
+    }
+
+    @Override
+    public boolean expectContinue() {
+        return request.expectContinue();
+    }
+
+    @Override
+    public URI uri() {
+        return request.uri();
+    }
+
+    @Override
+    public Optional<HttpClient.Version> version() {
+        return request.version();
+    }
+
+    @Override
+    public HttpHeaders headers() {
+        return request.headers();
     }
 }

@@ -23,7 +23,7 @@
  */
 package fr.monbanquet.sylph.processor;
 
-import fr.monbanquet.sylph.SylphHttpResponseException;
+import fr.monbanquet.sylph.exception.SylphHttpResponseException;
 
 import java.net.http.HttpResponse;
 

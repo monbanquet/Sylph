@@ -23,24 +23,17 @@
  */
 package fr.monbanquet.sylph;
 
+import fr.monbanquet.sylph.delegate.HttpResponseDelegate;
 import fr.monbanquet.sylph.parser.Parser;
 
-import javax.net.ssl.SSLSession;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpHeaders;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Optional;
 
-public class SylphHttpResponse<T> implements HttpResponse<T> {
-
-    private final HttpResponse<T> response;
+public class SylphHttpResponse<T> extends HttpResponseDelegate<T> {
 
     public SylphHttpResponse(HttpResponse<T> response) {
-        this.response = response;
+        super(response);
     }
 
     public static class BodyHandlers {
@@ -73,45 +66,4 @@ public class SylphHttpResponse<T> implements HttpResponse<T> {
 
     }
 
-    // --- Delegate HttpResponse --- //
-
-    @Override
-    public int statusCode() {
-        return response.statusCode();
-    }
-
-    @Override
-    public HttpRequest request() {
-        return response.request();
-    }
-
-    @Override
-    public Optional<HttpResponse<T>> previousResponse() {
-        return response.previousResponse();
-    }
-
-    @Override
-    public HttpHeaders headers() {
-        return response.headers();
-    }
-
-    @Override
-    public T body() {
-        return response.body();
-    }
-
-    @Override
-    public Optional<SSLSession> sslSession() {
-        return response.sslSession();
-    }
-
-    @Override
-    public URI uri() {
-        return response.uri();
-    }
-
-    @Override
-    public HttpClient.Version version() {
-        return response.version();
-    }
 }

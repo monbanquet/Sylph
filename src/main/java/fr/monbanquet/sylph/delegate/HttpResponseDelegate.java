@@ -21,29 +21,61 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.monbanquet.sylph;
+package fr.monbanquet.sylph.delegate;
 
-import fr.monbanquet.sylph.delegate.HttpRequestDelegate;
-
+import javax.net.ssl.SSLSession;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Optional;
 
-public class SylphHttpRequest extends HttpRequestDelegate {
+public class HttpResponseDelegate<T> implements HttpResponse<T> {
 
-    SylphHttpRequest(HttpRequest request) {
-        this.request = request;
+    private final HttpResponse<T> response;
+
+    public HttpResponseDelegate(HttpResponse<T> response) {
+        this.response = response;
     }
 
-    public static SylphHttpRequestBuilder newBuilder(String uri) {
-        return newBuilder(URI.create(uri));
+    @Override
+    public int statusCode() {
+        return response.statusCode();
     }
 
-    public static SylphHttpRequestBuilder newBuilder(URI uri) {
-        return SylphHttpRequestBuilder.newBuilder(uri);
+    @Override
+    public HttpRequest request() {
+        return response.request();
     }
 
-    public static SylphHttpRequestBuilder newBuilder() {
-        return SylphHttpRequestBuilder.newBuilder();
+    @Override
+    public Optional<HttpResponse<T>> previousResponse() {
+        return response.previousResponse();
     }
 
+    @Override
+    public HttpHeaders headers() {
+        return response.headers();
+    }
+
+    @Override
+    public T body() {
+        return response.body();
+    }
+
+    @Override
+    public Optional<SSLSession> sslSession() {
+        return response.sslSession();
+    }
+
+    @Override
+    public URI uri() {
+        return response.uri();
+    }
+
+    @Override
+    public HttpClient.Version version() {
+        return response.version();
+    }
 }

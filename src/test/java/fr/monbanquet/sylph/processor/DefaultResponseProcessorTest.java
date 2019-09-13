@@ -25,7 +25,7 @@ package fr.monbanquet.sylph.processor;
 
 import fr.monbanquet.sylph.Sylph;
 import fr.monbanquet.sylph.SylphHttpClient;
-import fr.monbanquet.sylph.SylphHttpResponseException;
+import fr.monbanquet.sylph.exception.SylphHttpResponseException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
