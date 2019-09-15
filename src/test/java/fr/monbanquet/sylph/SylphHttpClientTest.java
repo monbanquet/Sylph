@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
+import java.util.List;
 
 class SylphHttpClientTest {
 
@@ -39,7 +40,7 @@ class SylphHttpClientTest {
         Todo todo = Sylph.newClient()
                 .GET(TODO_1_URL)
                 .send(Todo.class)
-                .body();
+                .asObject();
 
         // then
         AssertTodo.assertResult(todo);
@@ -51,7 +52,7 @@ class SylphHttpClientTest {
         Todo todo = Sylph.newClient()
                 .GET(URI.create(TODO_1_URL))
                 .send(Todo.class)
-                .body();
+                .asObject();
 
         // then
         AssertTodo.assertResult(todo);
@@ -63,7 +64,7 @@ class SylphHttpClientTest {
         Todo todoResult = Sylph.newClient()
                 .POST(TODOS_URL)
                 .send(Todo.class)
-                .body();
+                .asObject();
 
         // then
         Assertions.assertNotEquals(todoResult.getId(), 0);
@@ -78,7 +79,7 @@ class SylphHttpClientTest {
         Todo todoResult = newClient()
                 .POST(URI.create(TODOS_URL))
                 .send(Todo.class)
-                .body();
+                .asObject();
 
         // then
         Assertions.assertNotEquals(todoResult.getId(), 0);
@@ -93,7 +94,7 @@ class SylphHttpClientTest {
         Todo todoResult = newClient()
                 .POST(TODOS_URL, todo)
                 .send(Todo.class)
-                .body();
+                .asObject();
 
         // then
         Assertions.assertNotEquals(todoResult.getId(), todo.getId());
@@ -108,7 +109,7 @@ class SylphHttpClientTest {
         Todo todoResult = newClient()
                 .POST(URI.create(TODOS_URL), todo)
                 .send(Todo.class)
-                .body();
+                .asObject();
 
         // then
         Assertions.assertNotEquals(todoResult.getId(), todo.getId());
@@ -123,7 +124,7 @@ class SylphHttpClientTest {
         Todo todoResult = newClient()
                 .PUT(TODOS_URL + "/" + id)
                 .send(Todo.class)
-                .body();
+                .asObject();
 
         // then
         Assertions.assertEquals(todoResult.getId(), id);
@@ -138,7 +139,7 @@ class SylphHttpClientTest {
         Todo todoResult = newClient()
                 .PUT(TODOS_URL + "/" + id)
                 .send(Todo.class)
-                .body();
+                .asObject();
 
         // then
         Assertions.assertEquals(todoResult.getId(), id);
@@ -154,7 +155,7 @@ class SylphHttpClientTest {
         Todo todoResult = newClient()
                 .PUT(TODOS_URL + "/" + id, todo)
                 .send(Todo.class)
-                .body();
+                .asObject();
 
         // then
         Assertions.assertEquals(todoResult.getId(), id);
@@ -170,7 +171,7 @@ class SylphHttpClientTest {
         Todo todoResult = newClient()
                 .PUT(URI.create(TODOS_URL + "/" + id), todo)
                 .send(Todo.class)
-                .body();
+                .asObject();
 
         // then
         Assertions.assertEquals(todoResult.getId(), id);
@@ -193,10 +194,35 @@ class SylphHttpClientTest {
         Todo todoResult = newClient()
                 .DELETE(URI.create(TODOS_URL + "/44"))
                 .send(Todo.class)
-                .body();
+                .asObject();
 
         // then
         Assertions.assertEquals(todoResult.getId(), 0);
+    }
+
+    @Test
+    void body_object_shortcut() {
+        // given
+        Todo todo = Helper.newTodo();
+
+        // when
+        Todo todoResult = newClient()
+                .POST(TODOS_URL, todo)
+                .body(Todo.class);
+
+        // then
+        Assertions.assertNotEquals(todoResult.getId(), todo.getId());
+    }
+
+    @Test
+    void body_list_shortcut() {
+        // when
+        List<Todo> todos = newClient()
+                .GET(TODOS_URL)
+                .bodyList(Todo.class);
+
+        // then
+        AssertTodo.assertResult(todos);
     }
 
     private SylphHttpClient newClient() {

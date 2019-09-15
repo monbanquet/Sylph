@@ -80,7 +80,7 @@ public class SylphTest {
         SylphHttpClient client = SylphHttpClient.newHttpClient();
 
         // when
-        SylphHttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        SylphHttpResponse<String, String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         // then
         String body = response.body();
@@ -89,7 +89,7 @@ public class SylphTest {
     }
 
     @Test
-    void as_standard_java_http_client_with_BodyHandlers_ofObject() {
+    void as_standard_java_http_client_with_object() {
         // given
         SylphHttpRequest request = SylphHttpRequest.newBuilder()
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -102,14 +102,14 @@ public class SylphTest {
         SylphHttpClient client = SylphHttpClient.newHttpClient();
 
         // when
-        Todo todo = client.send(request, SylphHttpResponse.BodyHandlers.ofObject(Todo.class, DefaultParser.create())).body();
+        Todo todo = client.send(request, Todo.class).asObject();
 
         // then
         AssertTodo.assertResult(todo);
     }
 
     @Test
-    void as_standard_java_http_client_with_BodyHandlers_ofObjects() {
+    void as_standard_java_http_client_with_object_list() {
         // given
         SylphHttpRequest request = SylphHttpRequest.newBuilder()
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -122,7 +122,7 @@ public class SylphTest {
         SylphHttpClient client = SylphHttpClient.newHttpClient();
 
         // when
-        List<Todo> todos = client.send(request, SylphHttpResponse.BodyHandlers.ofList(Todo.class, DefaultParser.create())).body();
+        List<Todo> todos = client.send(request, Todo.class).asList();
 
         // then
         AssertTodo.assertResult(todos);
@@ -170,7 +170,7 @@ public class SylphTest {
                 .getClient();
 
         // when
-        Todo responseBody = http.send(Todo.class).body();
+        Todo responseBody = http.send(Todo.class).asObject();
 
         // then
         AssertTodo.assertResult(responseBody);

@@ -53,8 +53,8 @@ class SylphHttpRequestBuilderTest {
 
         // when
         Todo todoResult = SylphHttpClient.newHttpClient()
-                .send(request, SylphHttpResponse.BodyHandlers.ofObject(Todo.class, DefaultParser.create()))
-                .body();
+                .send(request, Todo.class)
+                .asObject();
 
         // then
         Assertions.assertNotEquals(todoResult.getId(), todo.getId());
@@ -71,8 +71,8 @@ class SylphHttpRequestBuilderTest {
 
         // when
         Todo todoResult = SylphHttpClient.newHttpClient()
-                .send(request, SylphHttpResponse.BodyHandlers.ofObject(Todo.class, DefaultParser.create()))
-                .body();
+                .send(request, Todo.class)
+                .asObject();
 
         // then
         Assertions.assertNotEquals(todoResult.getId(), todo.getId());
@@ -89,8 +89,8 @@ class SylphHttpRequestBuilderTest {
 
         // when
         Todo todoResult = SylphHttpClient.newHttpClient()
-                .send(request, SylphHttpResponse.BodyHandlers.ofObject(Todo.class, DefaultParser.create()))
-                .body();
+                .send(request, Todo.class)
+                .asObject();
 
         // then
         Assertions.assertEquals(todoResult.getId(), todo.getId());
@@ -107,8 +107,8 @@ class SylphHttpRequestBuilderTest {
 
         // when
         Todo todoResult = SylphHttpClient.newHttpClient()
-                .send(request, SylphHttpResponse.BodyHandlers.ofObject(Todo.class, DefaultParser.create()))
-                .body();
+                .send(request, Todo.class)
+                .asObject();
 
         // then
         Assertions.assertEquals(todoResult.getId(), todo.getId());

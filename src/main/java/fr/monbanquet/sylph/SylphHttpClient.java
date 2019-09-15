@@ -34,7 +34,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class SylphHttpClient extends HttpClientDelegate {
@@ -45,7 +44,6 @@ public class SylphHttpClient extends HttpClientDelegate {
     private ResponseProcessor responseProcessor;
 
     SylphHttpClient() {
-
     }
 
     public static SylphHttpClient newHttpClient() {
@@ -163,27 +161,28 @@ public class SylphHttpClient extends HttpClientDelegate {
     // ---  --- //
 
     @Override
-    public <T> SylphHttpResponse<T> send(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler) {
-        return new SylphHttpResponse<>(doSend(request, responseBodyHandler));
+    public <T> SylphHttpResponse<T, T> send(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler) {
+        return new SylphHttpResponseSimple<>(doSend(request, responseBodyHandler));
     }
 
-    public <T> SylphHttpResponse<T> send(HttpResponse.BodyHandler<T> responseBodyHandler) {
-        return new SylphHttpResponse<>(doSend(getRequest(), responseBodyHandler));
+    public <T> SylphHttpResponse<T, T> send(HttpResponse.BodyHandler<T> responseBodyHandler) {
+        return new SylphHttpResponseSimple<>(doSend(getRequest(), responseBodyHandler));
     }
 
-    public <T> SylphHttpResponse<T> send(Class<T> returnType) {
-        return new SylphHttpResponse<>(doSend(getRequest(), SylphHttpResponse.BodyHandlers.ofObject(returnType, parser)));
+    public <T> SylphHttpResponse<String, T> send(HttpRequest request, Class<T> returnType) {
+        return new SylphHttpResponseTransform<>(doSend(request, HttpResponse.BodyHandlers.ofString()), returnType, parser);
     }
 
-    public <T> HttpResponse<List<T>> sendList(Class<T> returnType) {
-        return new SylphHttpResponse<>(doSend(getRequest(), SylphHttpResponse.BodyHandlers.ofList(returnType, parser)));
+    public <T> SylphHttpResponse<String, T> send(Class<T> returnType) {
+        return new SylphHttpResponseTransform<>(doSend(getRequest(), HttpResponse.BodyHandlers.ofString()), returnType, parser);
     }
 
-    public SylphHttpResponse<Void> send() {
-        return new SylphHttpResponse(doSend(getRequest(), HttpResponse.BodyHandlers.discarding()));
+    public SylphHttpResponse<Void, Void> send() {
+        return new SylphHttpResponseSimple(doSend(getRequest(), HttpResponse.BodyHandlers.discarding()));
     }
 
     private <T> HttpResponse<T> doSend(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler) {
+        // TODO log request
         HttpResponse<T> response;
         try {
             response = httpClient.send(request, responseBodyHandler);
@@ -192,61 +191,60 @@ public class SylphHttpClient extends HttpClientDelegate {
             String requestMethod = request.method();
             throw new SylphHttpRequestException(requestUri, requestMethod, e);
         }
-        return Optional.of(response)
-                .map(responseLogger::log)
-                .map(responseProcessor::processResponse)
-                .get();
+        responseLogger.log(response);
+        responseProcessor.processResponse(response);
+        return response;
     }
 
     @Override
     public <T> CompletableFuture<HttpResponse<T>> sendAsync(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler) {
         return httpClient.sendAsync(request, responseBodyHandler)
-                .thenApply(SylphHttpResponse::new);
+                .thenApply(SylphHttpResponseSimple::new);
     }
 
-    public <T> CompletableFuture<SylphHttpResponse<T>> sendAsync(HttpResponse.BodyHandler<T> responseBodyHandler) {
-        return doSendAsync(getRequest(), responseBodyHandler);
+    public <T> CompletableFuture<SylphHttpResponse<T, T>> sendAsync(HttpResponse.BodyHandler<T> responseBodyHandler) {
+        return doSendAsync(getRequest(), responseBodyHandler)
+                .thenApply(SylphHttpResponseSimple::new);
     }
 
-    public <T> CompletableFuture<SylphHttpResponse<T>> sendAsync(Class<T> returnType) {
-        return doSendAsync(getRequest(), SylphHttpResponse.BodyHandlers.ofObject(returnType, parser));
+    public <T> CompletableFuture<SylphHttpResponse<String, T>> sendAsync(Class<T> returnType) {
+        return doSendAsync(getRequest(), HttpResponse.BodyHandlers.ofString())
+                .thenApply(response -> new SylphHttpResponseTransform<>(response, returnType, parser));
     }
 
-    public <T> CompletableFuture<SylphHttpResponse<List<T>>> sendListAsync(Class<T> returnType) {
-        return doSendAsync(getRequest(), SylphHttpResponse.BodyHandlers.ofList(returnType, parser));
+    public CompletableFuture<SylphHttpResponse<Void, Void>> sendAsync() {
+        return doSendAsync(getRequest(), HttpResponse.BodyHandlers.discarding())
+                .thenApply(SylphHttpResponseSimple::new);
     }
 
-    public CompletableFuture<SylphHttpResponse<Void>> sendAsync() {
-        return doSendAsync(getRequest(), HttpResponse.BodyHandlers.discarding());
-    }
 
-    private <T> CompletableFuture<SylphHttpResponse<T>> doSendAsync(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler) {
+    private <T> CompletableFuture<HttpResponse<T>> doSendAsync(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler) {
         return httpClient.sendAsync(request, responseBodyHandler)
                 .thenApply(response -> responseLogger.log(response))
-                .thenApply(response -> responseProcessor.processResponse(response))
-                .thenApply(SylphHttpResponse::new);
+                .thenApply(response -> responseProcessor.processResponse(response));
     }
 
     // ---  --- //
 
     public <T> T body(Class<T> returnType) {
-        return send(returnType).body();
+        return send(returnType).asObject();
     }
 
     public <T> List<T> bodyList(Class<T> returnType) {
-        return sendList(returnType).body();
+        return send(returnType).asList();
     }
 
     public <T> CompletableFuture<T> bodyAsync(Class<T> returnType) {
-        return sendAsync(returnType).thenApply(SylphHttpResponse::body);
+        return sendAsync(returnType).thenApply(SylphHttpResponse::asObject);
     }
 
     public <T> CompletableFuture<List<T>> bodyListAsync(Class<T> returnType) {
-        return sendListAsync(returnType).thenApply(SylphHttpResponse::body);
+        return sendAsync(returnType).thenApply(SylphHttpResponse::asList);
     }
 
     public CompletableFuture<Void> bodyAsync() {
-        return sendAsync().thenAccept(r -> {});
+        return sendAsync().thenAccept(r -> {
+        });
     }
 
     // ---  --- //
