@@ -31,22 +31,36 @@ import java.util.stream.Collectors;
 
 public class DefaultRequestLogger implements RequestLogger {
 
-    private static Logger log = LoggerFactory.getLogger(DefaultRequestLogger.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultRequestLogger.class);
+
+    private final SylphLogger level;
+
+    DefaultRequestLogger() {
+        this.level = SylphLogger.DEBUG;
+    }
+
+    DefaultRequestLogger(SylphLogger level) {
+        this.level = level;
+    }
 
     public static RequestLogger create() {
         return new DefaultRequestLogger();
     }
 
+    public static RequestLogger create(SylphLogger level) {
+        return new DefaultRequestLogger(level);
+    }
+
     @Override
     public HttpRequest log(HttpRequest request) {
-        if (log.isDebugEnabled()) {
+        if (level.isEnabled(logger)) {
             String requestHeaders = request.headers().map().entrySet().stream()
                     .map(entry -> entry.getKey() + ":" + entry.getValue())
                     .collect(Collectors.joining(", "));
             if (!requestHeaders.isBlank()) {
-                log.debug(" - Request Headers : {}", requestHeaders);
+                level.prepare(logger).log(" - Request Headers : {}", requestHeaders);
             }
-            log.debug(" - Request {} {}", request.method(), request.uri());
+            level.prepare(logger).log(" - Request {} {}", request.method(), request.uri());
         }
         return request;
     }

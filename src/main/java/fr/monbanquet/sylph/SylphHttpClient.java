@@ -56,22 +56,22 @@ public class SylphHttpClient extends HttpClientDelegate {
         return new SylphHttpClientBuilder();
     }
 
-    public <T> SylphHttpClient GET(String uri) {
+    public SylphHttpClient GET(String uri) {
         return GET(URI.create(uri));
     }
 
-    public <T> SylphHttpClient GET(URI uri) {
+    public SylphHttpClient GET(URI uri) {
         this.baseRequest = baseRequest.copy()
                 .uri(uri)
                 .GET();
         return this;
     }
 
-    public <T> SylphHttpClient POST(String uri) {
+    public SylphHttpClient POST(String uri) {
         return POST(URI.create(uri));
     }
 
-    public <T> SylphHttpClient POST(URI uri) {
+    public SylphHttpClient POST(URI uri) {
         this.baseRequest = baseRequest.copy()
                 .uri(uri)
                 .POST(HttpRequest.BodyPublishers.noBody());

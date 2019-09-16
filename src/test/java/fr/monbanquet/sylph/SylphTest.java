@@ -25,6 +25,7 @@ package fr.monbanquet.sylph;
 
 import fr.monbanquet.sylph.logger.DefaultRequestLogger;
 import fr.monbanquet.sylph.logger.DefaultResponseLogger;
+import fr.monbanquet.sylph.logger.SylphLogger;
 import fr.monbanquet.sylph.parser.DefaultParser;
 import fr.monbanquet.sylph.parser.Parser;
 import fr.monbanquet.sylph.processor.DefaultResponseProcessor;
@@ -166,7 +167,7 @@ public class SylphTest {
                         .followRedirects(HttpClient.Redirect.ALWAYS)
                 )
                 .setParser(DefaultParser.create())
-                .setRequestLogger(DefaultRequestLogger.create())
+                .setRequestLogger(DefaultRequestLogger.create(SylphLogger.INFO))
                 .setResponseLogger(DefaultResponseLogger.create())
                 .setResponseProcessor(new DefaultResponseProcessor())
                 .getClient();

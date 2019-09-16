@@ -31,22 +31,36 @@ import java.util.stream.Collectors;
 
 public class DefaultResponseLogger implements ResponseLogger {
 
-    private static Logger log = LoggerFactory.getLogger(DefaultResponseLogger.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultRequestLogger.class);
+
+    private final SylphLogger level;
+
+    DefaultResponseLogger() {
+        this.level = SylphLogger.DEBUG;
+    }
+
+    DefaultResponseLogger(SylphLogger level) {
+        this.level = level;
+    }
 
     public static ResponseLogger create() {
         return new DefaultResponseLogger();
     }
 
+    public static ResponseLogger create(SylphLogger level) {
+        return new DefaultResponseLogger(level);
+    }
+
     public <T> HttpResponse<T> log(HttpResponse<T> response) {
-        if (log.isDebugEnabled()) {
+        if (level.isEnabled(logger)) {
             String responseHeader = response.headers().map().entrySet().stream()
                     .map(entry -> entry.getKey() + ":" + entry.getValue())
                     .collect(Collectors.joining(", "));
             if (!responseHeader.isBlank()) {
-                log.debug(" - Response Headers : {}", responseHeader);
+                level.prepare(logger).log(" - Response Headers : {}", responseHeader);
             }
-            log.debug(" - Response Status Code: {}", response.statusCode());
-            log.debug(" - Response Body : {}", response.body());
+            level.prepare(logger).log(" - Response Status Code: {}", response.statusCode());
+            level.prepare(logger).log(" - Response Body : {}", response.body());
         }
         return response;
     }
