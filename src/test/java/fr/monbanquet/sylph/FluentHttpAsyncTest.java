@@ -52,7 +52,7 @@ public class FluentHttpAsyncTest {
                 .GET()
                 .copy()
                 .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(1))
+                .timeout(Duration.ofSeconds(5))
                 .build();
         HttpClient client = HttpClient.newHttpClient();
 
@@ -75,7 +75,7 @@ public class FluentHttpAsyncTest {
                 .GET()
                 .copy()
                 .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(1))
+                .timeout(Duration.ofSeconds(5))
                 .build();
         SylphHttpClient client = SylphHttpClient.newHttpClient();
 

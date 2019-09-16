@@ -24,6 +24,7 @@
 package fr.monbanquet.sylph;
 
 import fr.monbanquet.sylph.delegate.HttpClientBuilderDelegate;
+import fr.monbanquet.sylph.logger.RequestLogger;
 import fr.monbanquet.sylph.logger.ResponseLogger;
 import fr.monbanquet.sylph.parser.Parser;
 import fr.monbanquet.sylph.processor.ResponseProcessor;
@@ -42,6 +43,7 @@ public class SylphHttpClientBuilder extends HttpClientBuilderDelegate {
 
     private SylphHttpRequestBuilder baseRequest;
     private Parser parser;
+    private RequestLogger requestLogger;
     private ResponseLogger responseLogger;
     private ResponseProcessor responseProcessor;
 
@@ -53,6 +55,7 @@ public class SylphHttpClientBuilder extends HttpClientBuilderDelegate {
     public SylphHttpClient build() {
         Objects.requireNonNull(baseRequest, "Client require a BaseRequest");
         Objects.requireNonNull(parser, "Client require a Parser");
+        Objects.requireNonNull(requestLogger, "Client require a RequestLogger");
         Objects.requireNonNull(responseLogger, "Client require a ResponseLogger");
         Objects.requireNonNull(responseProcessor, "Client require a ResponseProcessor");
         HttpClient client = builder.build();
@@ -60,6 +63,7 @@ public class SylphHttpClientBuilder extends HttpClientBuilderDelegate {
         fluentClient.setBaseRequest(baseRequest);
         fluentClient.setHttpClient(client);
         fluentClient.setParser(parser);
+        fluentClient.setRequestLogger(requestLogger);
         fluentClient.setResponseLogger(responseLogger);
         fluentClient.setResponseProcessor(responseProcessor);
         return fluentClient;
@@ -71,6 +75,10 @@ public class SylphHttpClientBuilder extends HttpClientBuilderDelegate {
 
     void parser(Parser parser) {
         this.parser = parser;
+    }
+
+    void requestLogger(RequestLogger requestLogger) {
+        this.requestLogger = requestLogger;
     }
 
     void responseLogger(ResponseLogger responseLogger) {

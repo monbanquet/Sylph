@@ -23,7 +23,9 @@
  */
 package fr.monbanquet.sylph;
 
+import fr.monbanquet.sylph.logger.DefaultRequestLogger;
 import fr.monbanquet.sylph.logger.DefaultResponseLogger;
+import fr.monbanquet.sylph.logger.RequestLogger;
 import fr.monbanquet.sylph.logger.ResponseLogger;
 import fr.monbanquet.sylph.parser.DefaultParser;
 import fr.monbanquet.sylph.parser.Parser;
@@ -36,6 +38,7 @@ public class Sylph {
 
     private SylphHttpRequestBuilder baseRequest;
     private Parser parser;
+    private RequestLogger requestLogger;
     private ResponseLogger responseLogger;
     private ResponseProcessor responseProcessor;
     private SylphHttpClientBuilder client = new SylphHttpClientBuilder();
@@ -62,6 +65,10 @@ public class Sylph {
             parser = DefaultParser.create();
         }
 
+        if (Objects.isNull(requestLogger)) {
+            requestLogger = DefaultRequestLogger.create();
+        }
+
         if (Objects.isNull(responseLogger)) {
             responseLogger = DefaultResponseLogger.create();
         }
@@ -74,6 +81,7 @@ public class Sylph {
 
         client.baseRequest(baseRequest);
         client.parser(parser);
+        client.requestLogger(requestLogger);
         client.responseLogger(responseLogger);
         client.responseProcessor(responseProcessor);
 
@@ -93,6 +101,11 @@ public class Sylph {
 
     public Sylph setParser(Parser parser) {
         this.parser = parser;
+        return this;
+    }
+
+    public Sylph setRequestLogger(RequestLogger requestLogger) {
+        this.requestLogger = requestLogger;
         return this;
     }
 

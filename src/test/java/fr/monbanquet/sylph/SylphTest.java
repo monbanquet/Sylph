@@ -23,6 +23,7 @@
  */
 package fr.monbanquet.sylph;
 
+import fr.monbanquet.sylph.logger.DefaultRequestLogger;
 import fr.monbanquet.sylph.logger.DefaultResponseLogger;
 import fr.monbanquet.sylph.parser.DefaultParser;
 import fr.monbanquet.sylph.parser.Parser;
@@ -53,7 +54,7 @@ public class SylphTest {
                 .GET()
                 .copy()
                 .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(1))
+                .timeout(Duration.ofSeconds(5))
                 .build();
         HttpClient client = HttpClient.newHttpClient();
 
@@ -75,7 +76,7 @@ public class SylphTest {
                 .GET()
                 .copy()
                 .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(1))
+                .timeout(Duration.ofSeconds(5))
                 .build();
         SylphHttpClient client = SylphHttpClient.newHttpClient();
 
@@ -97,7 +98,7 @@ public class SylphTest {
                 .GET()
                 .copy()
                 .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(1))
+                .timeout(Duration.ofSeconds(5))
                 .build();
         SylphHttpClient client = SylphHttpClient.newHttpClient();
 
@@ -117,7 +118,7 @@ public class SylphTest {
                 .GET()
                 .copy()
                 .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(1))
+                .timeout(Duration.ofSeconds(5))
                 .build();
         SylphHttpClient client = SylphHttpClient.newHttpClient();
 
@@ -165,7 +166,8 @@ public class SylphTest {
                         .followRedirects(HttpClient.Redirect.ALWAYS)
                 )
                 .setParser(DefaultParser.create())
-                .setResponseLogger(new DefaultResponseLogger())
+                .setRequestLogger(DefaultRequestLogger.create())
+                .setResponseLogger(DefaultResponseLogger.create())
                 .setResponseProcessor(new DefaultResponseProcessor())
                 .getClient();
 

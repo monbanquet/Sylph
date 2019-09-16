@@ -23,12 +23,9 @@
  */
 package fr.monbanquet.sylph.logger;
 
-import java.net.http.HttpResponse;
+import java.net.http.HttpRequest;
 
-public class EmptyResponseLogger implements ResponseLogger {
+public interface RequestLogger {
 
-    public <T> HttpResponse<T> log(HttpResponse<T> response) {
-        return response;
-    }
-
+    HttpRequest log(HttpRequest request);
 }

@@ -26,29 +26,28 @@ package fr.monbanquet.sylph.logger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.http.HttpResponse;
+import java.net.http.HttpRequest;
 import java.util.stream.Collectors;
 
-public class DefaultResponseLogger implements ResponseLogger {
+public class DefaultRequestLogger implements RequestLogger {
 
-    private static Logger log = LoggerFactory.getLogger(DefaultResponseLogger.class);
+    private static Logger log = LoggerFactory.getLogger(DefaultRequestLogger.class);
 
-    public static ResponseLogger create() {
-        return new DefaultResponseLogger();
+    public static RequestLogger create() {
+        return new DefaultRequestLogger();
     }
 
-    public <T> HttpResponse<T> log(HttpResponse<T> response) {
+    @Override
+    public HttpRequest log(HttpRequest request) {
         if (log.isDebugEnabled()) {
-            String responseHeader = response.headers().map().entrySet().stream()
+            String requestHeaders = request.headers().map().entrySet().stream()
                     .map(entry -> entry.getKey() + ":" + entry.getValue())
                     .collect(Collectors.joining(", "));
-            if (!responseHeader.isBlank()) {
-                log.debug(" - Response Headers : {}", responseHeader);
+            if (!requestHeaders.isBlank()) {
+                log.debug(" - Request Headers : {}", requestHeaders);
             }
-            log.debug(" - Response Status Code: {}", response.statusCode());
-            log.debug(" - Response Body : {}", response.body());
+            log.debug(" - Request {} {}", request.method(), request.uri());
         }
-        return response;
+        return request;
     }
-
 }

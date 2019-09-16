@@ -25,6 +25,7 @@ package fr.monbanquet.sylph;
 
 import fr.monbanquet.sylph.delegate.HttpClientDelegate;
 import fr.monbanquet.sylph.exception.SylphHttpRequestException;
+import fr.monbanquet.sylph.logger.RequestLogger;
 import fr.monbanquet.sylph.logger.ResponseLogger;
 import fr.monbanquet.sylph.parser.Parser;
 import fr.monbanquet.sylph.processor.ResponseProcessor;
@@ -40,6 +41,7 @@ public class SylphHttpClient extends HttpClientDelegate {
 
     private SylphHttpRequestBuilder baseRequest;
     private Parser parser;
+    private RequestLogger requestLogger;
     private ResponseLogger responseLogger;
     private ResponseProcessor responseProcessor;
 
@@ -182,7 +184,7 @@ public class SylphHttpClient extends HttpClientDelegate {
     }
 
     private <T> HttpResponse<T> doSend(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler) {
-        // TODO log request
+        requestLogger.log(request);
         HttpResponse<T> response;
         try {
             response = httpClient.send(request, responseBodyHandler);
@@ -219,7 +221,8 @@ public class SylphHttpClient extends HttpClientDelegate {
 
 
     private <T> CompletableFuture<HttpResponse<T>> doSendAsync(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler) {
-        return httpClient.sendAsync(request, responseBodyHandler)
+        return CompletableFuture.supplyAsync(() -> requestLogger.log(request))
+                .thenCompose(r -> httpClient.sendAsync(request, responseBodyHandler))
                 .thenApply(response -> responseLogger.log(response))
                 .thenApply(response -> responseProcessor.processResponse(response));
     }
@@ -263,6 +266,10 @@ public class SylphHttpClient extends HttpClientDelegate {
 
     public void setParser(Parser parser) {
         this.parser = parser;
+    }
+
+    public void setRequestLogger(RequestLogger requestLogger) {
+        this.requestLogger = requestLogger;
     }
 
     public void setResponseLogger(ResponseLogger responseLogger) {
