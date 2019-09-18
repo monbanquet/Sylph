@@ -30,9 +30,9 @@ import org.junit.jupiter.api.Test;
 
 class SylphHttpRequestBuilderTest {
 
-    private static String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
+    private static final String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
 
-    private static Parser parser = DefaultParser.create();
+    private static final Parser parser = DefaultParser.create();
 
     @Test
     void post_should_throws_exception_when_no_parser() {

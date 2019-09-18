@@ -48,7 +48,7 @@ public class DefaultResponseProcessor implements ResponseProcessor {
             String requestMethod = response.request().method();
             int responseCode = response.statusCode();
             String errorBody = response.body() instanceof String ? (String) response.body() : "";
-            log.error("Error while executing call {};{} : responseCode={}, errorBody={}",
+            log.error("Error while executing call {} {} : responseCode={}, errorBody={}",
                     requestMethod, requestUri, responseCode, errorBody);
 
             throw new SylphHttpResponseException(requestUri, requestMethod, responseCode, errorBody);

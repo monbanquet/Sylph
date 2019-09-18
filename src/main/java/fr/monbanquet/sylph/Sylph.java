@@ -41,7 +41,7 @@ public class Sylph {
     private RequestLogger requestLogger;
     private ResponseLogger responseLogger;
     private ResponseProcessor responseProcessor;
-    private SylphHttpClientBuilder client = new SylphHttpClientBuilder();
+    private SylphHttpClientBuilder client;
 
     public static Sylph builder() {
         return new Sylph();
@@ -79,6 +79,7 @@ public class Sylph {
 
         baseRequest.parser(parser);
 
+        client = new SylphHttpClientBuilder();
         client.baseRequest(baseRequest);
         client.parser(parser);
         client.requestLogger(requestLogger);

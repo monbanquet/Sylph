@@ -31,8 +31,8 @@ import java.util.List;
 
 class SylphHttpClientTest {
 
-    private static String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
-    private static String TODO_1_URL = TODOS_URL + "/1";
+    private static final String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
+    private static final String TODO_1_URL = TODOS_URL + "/1";
 
     @Test
     void get_with_url_string() {

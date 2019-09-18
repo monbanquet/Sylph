@@ -36,12 +36,12 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
 
-public class FluentHttpAsyncTest {
+public class SylphHttpClientAsyncTest {
 
-    private static String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
-    private static String TODO_1_URL = TODOS_URL + "/1";
+    private static final String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
+    private static final String TODO_1_URL = TODOS_URL + "/1";
 
-    private static Parser parser = DefaultParser.create();
+    private static final Parser parser = DefaultParser.create();
 
     @Test
     void standard_java_http_client() {
