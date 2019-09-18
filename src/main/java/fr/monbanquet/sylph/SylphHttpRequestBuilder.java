@@ -61,7 +61,6 @@ public class SylphHttpRequestBuilder extends HttpRequestBuilderDelegate {
                         .timeout(Duration.ofSeconds(30)));
     }
 
-
     // ---  --- //
 
     public SylphHttpRequestBuilder uri(String uri) {

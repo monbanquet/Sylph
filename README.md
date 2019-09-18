@@ -19,8 +19,8 @@ Sylph add new features, remove repetitive codes and keep same method signature o
 ## Sylph features
 - New builders 
 - Default JSON converter
-- Custom request processing
-- Logs
+- Custom response processing
+- Logs request and response
 - An URL Builder
 - All Exception are convert to RuntimeException 
 
@@ -53,9 +53,7 @@ URI uri = SylphUri.newUri()
 
 ## Architecture
 
-The Sylph class is use to build SylphHttpClient.
-
-Each Sylph class is a mapping of JDK HTTP Client 
+Each Sylph class is a subclass or implements a JDK HTTP Client 
 
 | JDK                  | Sylph                    |
 | -------------------- | ------------------------ |
@@ -66,21 +64,22 @@ Each Sylph class is a mapping of JDK HTTP Client
 | HttpClient           | SylphHttpClient          |
 | HttpResponse<T>      | SylphHttpResponse<T>     |
 
+The Sylph class is a builder and is used to build SylphHttpClient.
 
 SylphHttpClient add some nice features :
+
 - SylphHttpClient POST(String uri)
 - SylphHttpClient POST(URI uri)
 - SylphHttpClient POST(String uri, T body)
-- SylphHttpClient POST(URI uri, T body)  
+- SylphHttpClient POST(URI uri, T body)
+- SylphHttpClient POST(T body)  
 
 Also for PUT, GET and DELETE
 
 There are some useful shortcuts :
 - SylphHttpResponse<T> send(Class<T> returnType)
-- SylphHttpResponse<List<T>> sendList(Class<T> returnType)
 - SylphHttpResponse<Void> send()
 - CompletableFuture<SylphHttpResponse<T>> sendAsync(Class<T> returnType)
-- CompletableFuture<SylphHttpResponse<List<T>>> sendListAsync(Class<T> returnType)
 - CompletableFuture<SylphHttpResponse<Void>> sendAsync() 
 
 And some shortcuts more powerful :
@@ -99,6 +98,7 @@ SylphHttpClient http = Sylph.builder()
         .setBaseRequest(SylphHttpRequest.newBuilder())
         .setClient(SylphHttpClient.newBuilder())
         .setParser(new JacksonParser())
+        .setRequestLogger(DefaultRequestLogger.create(SylphLogger.INFO))
         .setResponseLogger(new DefaultResponseLogger())
         .setResponseProcessor(new DefaultResponseProcessor())
         .getClient();
@@ -107,7 +107,7 @@ SylphHttpClient http = Sylph.builder()
 ### Base request
 
 SylphHttpClient contains a SylphHttpRequest with initial request parameters.
-For example, you can set a base request with an url, a header and timeout and it will be always use. 
+For example, you can set a base request with an url, a header and timeout and it will be always use for next requests. 
 
 ```java
 SylphHttpClient http = Sylph.builder()
@@ -119,7 +119,7 @@ SylphHttpClient http = Sylph.builder()
 
 ### Http client 
 
-You can also configure SylphHttpClient by using methods from JDK client.
+You can also configure SylphHttpClient. All methods from JDK client are available.
 
 ```java
 SylphHttpClient http = Sylph.builder()
@@ -153,13 +153,19 @@ SylphHttpClient http = Sylph.builder()
         .getClient();
 ```
 
-### Response logger
+### Request and response logger
 
 Sylph add a flexible log system. Default implementation is active when log level is debug. 
 You can change log logic by using Sylph builder.
 
 ```java
 SylphHttpClient http = Sylph.builder()
+        .setRequestLogger(new RequestLogger() {
+            @Override
+            public HttpRequest log(HttpRequest request) {
+                // To complete
+            }
+        })
         .setResponseLogger(new ResponseLogger() {
             @Override
             public <T> HttpResponse<T> log(HttpResponse<T> response) {
@@ -171,7 +177,7 @@ SylphHttpClient http = Sylph.builder()
 
 ### Response processor
 
-Sylph add also a response process for doing actions on response.
+Sylph add also a response processor for doing actions on response.
 By default Sylph check if response status code is equal or greater than 300 and throw an exception.
 You can also override this behavior.
 
