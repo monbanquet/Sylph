@@ -58,7 +58,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.source>${java.version}</maven.compiler.source>
 
-        <jackson.version>2.9.9</jackson.version>
+        <jackson.version>2.10.0.pr3</jackson.version>
         <junit.version>5.5.0-M1</junit.version>
     </properties>
 
