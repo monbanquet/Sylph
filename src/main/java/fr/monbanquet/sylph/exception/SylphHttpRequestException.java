@@ -21,29 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.monbanquet.sylph;
+package fr.monbanquet.sylph.exception;
 
-import fr.monbanquet.sylph.delegate.HttpRequestDelegate;
+import java.text.MessageFormat;
 
-import java.net.URI;
-import java.net.http.HttpRequest;
+public class SylphHttpRequestException extends SylphException {
 
-public class SylphHttpRequest extends HttpRequestDelegate {
+    private static final long serialVersionUID = 1L;
 
-    SylphHttpRequest(HttpRequest request) {
-        this.request = request;
+    private final String requestUri;
+    private final String requestMethod;
+
+    public SylphHttpRequestException(String requestUri, String requestMethod, Exception e) {
+        super(e);
+        this.requestUri = requestUri;
+        this.requestMethod = requestMethod;
     }
 
-    public static SylphHttpRequestBuilder newBuilder(String uri) {
-        return newBuilder(URI.create(uri));
+    @Override
+    public String getMessage() {
+        return MessageFormat.format("Error while executing call {0};{1} : error={2}",
+                requestMethod, requestUri, super.getMessage());
     }
 
-    public static SylphHttpRequestBuilder newBuilder(URI uri) {
-        return SylphHttpRequestBuilder.newBuilder(uri);
+    public String getRequestUri() {
+        return requestUri;
     }
 
-    public static SylphHttpRequestBuilder newBuilder() {
-        return SylphHttpRequestBuilder.newBuilder();
+    public String getRequestMethod() {
+        return requestMethod;
     }
-
 }

@@ -23,6 +23,7 @@
  */
 package fr.monbanquet.sylph;
 
+import fr.monbanquet.sylph.delegate.HttpRequestBuilderDelegate;
 import fr.monbanquet.sylph.parser.Parser;
 
 import java.net.URI;
@@ -31,13 +32,12 @@ import java.net.http.HttpRequest;
 import java.time.Duration;
 import java.util.Objects;
 
-public class SylphHttpRequestBuilder implements HttpRequest.Builder {
+public class SylphHttpRequestBuilder extends HttpRequestBuilderDelegate {
 
-    protected final HttpRequest.Builder internalBuilder;
     protected Parser parser;
 
     SylphHttpRequestBuilder(HttpRequest.Builder internalBuilder) {
-        this.internalBuilder = internalBuilder;
+        super(internalBuilder);
     }
 
     public static SylphHttpRequestBuilder newBuilder(URI uri) {
@@ -60,7 +60,6 @@ public class SylphHttpRequestBuilder implements HttpRequest.Builder {
                         .header("Content-Type", "application/json")
                         .timeout(Duration.ofSeconds(30)));
     }
-
 
     // ---  --- //
 
@@ -90,7 +89,7 @@ public class SylphHttpRequestBuilder implements HttpRequest.Builder {
 
     @Override
     public SylphHttpRequest build() {
-        return new SylphHttpRequest(internalBuilder.build());
+        return new SylphHttpRequest(builder.build());
     }
 
     SylphHttpRequestBuilder parser(Parser parser) {
@@ -98,83 +97,83 @@ public class SylphHttpRequestBuilder implements HttpRequest.Builder {
         return this;
     }
 
-    // --- Delegate HttpRequest.Builder --- //
+    // ---  --- //
 
     @Override
     public SylphHttpRequestBuilder uri(URI uri) {
-        this.internalBuilder.uri(uri);
+        this.builder.uri(uri);
         return this;
     }
 
     @Override
     public SylphHttpRequestBuilder expectContinue(boolean enable) {
-        this.internalBuilder.expectContinue(enable);
+        this.builder.expectContinue(enable);
         return this;
     }
 
     @Override
     public SylphHttpRequestBuilder version(HttpClient.Version version) {
-        this.internalBuilder.version(version);
+        this.builder.version(version);
         return this;
     }
 
     @Override
     public SylphHttpRequestBuilder header(String name, String value) {
-        this.internalBuilder.header(name, value);
+        this.builder.header(name, value);
         return this;
     }
 
     @Override
     public SylphHttpRequestBuilder headers(String... headers) {
-        this.internalBuilder.headers(headers);
+        this.builder.headers(headers);
         return this;
     }
 
     @Override
     public SylphHttpRequestBuilder timeout(Duration duration) {
-        this.internalBuilder.timeout(duration);
+        this.builder.timeout(duration);
         return this;
     }
 
     @Override
     public SylphHttpRequestBuilder setHeader(String name, String value) {
-        this.internalBuilder.setHeader(name, value);
+        this.builder.setHeader(name, value);
         return this;
     }
 
     @Override
     public SylphHttpRequestBuilder GET() {
-        this.internalBuilder.GET();
+        this.builder.GET();
         return this;
     }
 
     @Override
     public SylphHttpRequestBuilder POST(HttpRequest.BodyPublisher bodyPublisher) {
-        this.internalBuilder.POST(bodyPublisher);
+        this.builder.POST(bodyPublisher);
         return this;
     }
 
     @Override
     public SylphHttpRequestBuilder PUT(HttpRequest.BodyPublisher bodyPublisher) {
-        this.internalBuilder.PUT(bodyPublisher);
+        this.builder.PUT(bodyPublisher);
         return this;
     }
 
     @Override
     public SylphHttpRequestBuilder DELETE() {
-        this.internalBuilder.DELETE();
+        this.builder.DELETE();
         return this;
     }
 
     @Override
     public SylphHttpRequestBuilder method(String method, HttpRequest.BodyPublisher bodyPublisher) {
-        this.internalBuilder.method(method, bodyPublisher);
+        this.builder.method(method, bodyPublisher);
         return this;
     }
 
     @Override
     public SylphHttpRequestBuilder copy() {
-        this.internalBuilder.copy();
+        this.builder.copy();
         return this;
     }
 

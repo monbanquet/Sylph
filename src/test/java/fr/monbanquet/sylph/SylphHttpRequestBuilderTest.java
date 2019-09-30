@@ -30,9 +30,9 @@ import org.junit.jupiter.api.Test;
 
 class SylphHttpRequestBuilderTest {
 
-    private static String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
+    private static final String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
 
-    private static Parser parser = DefaultParser.create();
+    private static final Parser parser = DefaultParser.create();
 
     @Test
     void post_should_throws_exception_when_no_parser() {
@@ -53,8 +53,8 @@ class SylphHttpRequestBuilderTest {
 
         // when
         Todo todoResult = SylphHttpClient.newHttpClient()
-                .send(request, SylphHttpResponse.BodyHandlers.ofObject(Todo.class, DefaultParser.create()))
-                .body();
+                .send(request, Todo.class)
+                .asObject();
 
         // then
         Assertions.assertNotEquals(todoResult.getId(), todo.getId());
@@ -71,8 +71,8 @@ class SylphHttpRequestBuilderTest {
 
         // when
         Todo todoResult = SylphHttpClient.newHttpClient()
-                .send(request, SylphHttpResponse.BodyHandlers.ofObject(Todo.class, DefaultParser.create()))
-                .body();
+                .send(request, Todo.class)
+                .asObject();
 
         // then
         Assertions.assertNotEquals(todoResult.getId(), todo.getId());
@@ -89,8 +89,8 @@ class SylphHttpRequestBuilderTest {
 
         // when
         Todo todoResult = SylphHttpClient.newHttpClient()
-                .send(request, SylphHttpResponse.BodyHandlers.ofObject(Todo.class, DefaultParser.create()))
-                .body();
+                .send(request, Todo.class)
+                .asObject();
 
         // then
         Assertions.assertEquals(todoResult.getId(), todo.getId());
@@ -107,8 +107,8 @@ class SylphHttpRequestBuilderTest {
 
         // when
         Todo todoResult = SylphHttpClient.newHttpClient()
-                .send(request, SylphHttpResponse.BodyHandlers.ofObject(Todo.class, DefaultParser.create()))
-                .body();
+                .send(request, Todo.class)
+                .asObject();
 
         // then
         Assertions.assertEquals(todoResult.getId(), todo.getId());

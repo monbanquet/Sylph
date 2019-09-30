@@ -26,51 +26,32 @@ package fr.monbanquet.sylph;
 import fr.monbanquet.sylph.parser.Parser;
 
 import java.net.http.HttpResponse;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Flow;
 
-public class ListBodySubscriber<T> implements HttpResponse.BodySubscriber<List<T>> {
+public class SylphHttpResponseTransform<T> extends SylphHttpResponse<String, T> {
 
-    private final HttpResponse.BodySubscriber<String> subscriber;
-    private final Class<T> returnType;
+    private final HttpResponse<String> response;
+    private final Class<T> bodyType;
     private final Parser parser;
 
-    public ListBodySubscriber(Charset charset, Class<T> returnType, Parser parser) {
-        Objects.requireNonNull(charset);
-        Objects.requireNonNull(returnType);
-        Objects.requireNonNull(parser);
-        this.subscriber = HttpResponse.BodySubscribers.ofString(charset);
-        this.returnType = returnType;
+    public SylphHttpResponseTransform(HttpResponse<String> response, Class<T> bodyType, Parser parser) {
+        super(response);
+        this.response = response;
+        this.bodyType = bodyType;
         this.parser = parser;
     }
 
-    @Override
-    public CompletionStage<List<T>> getBody() {
-        return subscriber.getBody()
-                .thenApplyAsync(body -> parser.deserializeList(body, returnType));
+    public T asObject() {
+        Objects.requireNonNull(parser);
+        String data = response.body();
+        return parser.deserialize(data, bodyType);
     }
 
-    @Override
-    public void onSubscribe(Flow.Subscription subscription) {
-        subscriber.onSubscribe(subscription);
+    public List<T> asList() {
+        Objects.requireNonNull(parser);
+        String data = response.body();
+        return parser.deserializeList(data, bodyType);
     }
 
-    @Override
-    public void onNext(List<ByteBuffer> item) {
-        subscriber.onNext(item);
-    }
-
-    @Override
-    public void onError(Throwable throwable) {
-        subscriber.onError(throwable);
-    }
-
-    @Override
-    public void onComplete() {
-        subscriber.onComplete();
-    }
 }

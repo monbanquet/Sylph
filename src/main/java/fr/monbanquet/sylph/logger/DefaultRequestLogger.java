@@ -21,38 +21,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.monbanquet.sylph.processor;
+package fr.monbanquet.sylph.logger;
 
-import fr.monbanquet.sylph.exception.SylphHttpResponseException;
-import fr.monbanquet.sylph.logger.DefaultResponseLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.http.HttpResponse;
+import java.net.http.HttpRequest;
+import java.util.stream.Collectors;
 
-public class DefaultResponseProcessor implements ResponseProcessor {
+public class DefaultRequestLogger implements RequestLogger {
 
-    private static Logger log = LoggerFactory.getLogger(DefaultResponseLogger.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultRequestLogger.class);
 
-    public static ResponseProcessor create() {
-        return new DefaultResponseProcessor();
+    private final SylphLogger level;
+
+    DefaultRequestLogger() {
+        this.level = SylphLogger.DEBUG;
+    }
+
+    DefaultRequestLogger(SylphLogger level) {
+        this.level = level;
+    }
+
+    public static RequestLogger create() {
+        return new DefaultRequestLogger();
+    }
+
+    public static RequestLogger create(SylphLogger level) {
+        return new DefaultRequestLogger(level);
     }
 
     @Override
-    public <T> HttpResponse<T> processResponse(HttpResponse<T> response) throws SylphHttpResponseException {
-        if (response.statusCode() < 300) {
-            return response;
-
-        } else {
-            String requestUri = response.request().uri().toString();
-            String requestMethod = response.request().method();
-            int responseCode = response.statusCode();
-            String errorBody = response.body() instanceof String ? (String) response.body() : "";
-            log.error("Error while executing call {} {} : responseCode={}, errorBody={}",
-                    requestMethod, requestUri, responseCode, errorBody);
-
-            throw new SylphHttpResponseException(requestUri, requestMethod, responseCode, errorBody);
+    public HttpRequest log(HttpRequest request) {
+        if (level.isEnabled(logger)) {
+            String requestHeaders = request.headers().map().entrySet().stream()
+                    .map(entry -> entry.getKey() + ":" + entry.getValue())
+                    .collect(Collectors.joining(", "));
+            if (!requestHeaders.isBlank()) {
+                level.prepare(logger).log(" - Request Headers : {}", requestHeaders);
+            }
+            level.prepare(logger).log(" - Request {} {}", request.method(), request.uri());
         }
+        return request;
     }
-
 }

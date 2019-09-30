@@ -23,6 +23,8 @@
  */
 package fr.monbanquet.sylph;
 
+import fr.monbanquet.sylph.exception.SylphException;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;

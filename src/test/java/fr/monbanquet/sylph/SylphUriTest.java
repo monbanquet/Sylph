@@ -23,6 +23,7 @@
  */
 package fr.monbanquet.sylph;
 
+import fr.monbanquet.sylph.exception.SylphException;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;

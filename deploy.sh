@@ -1,5 +1,5 @@
 #!/bin/bash
 
-mvn clean verify
-mvn release:prepare -P release -DskipTests
-mvn release:perform -P release -DskipTests
+mvn release:clean
+mvn release:prepare -Prelease
+mvn release:perform -Prelease

@@ -36,12 +36,12 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
 
-public class FluentHttpAsyncTest {
+public class SylphHttpClientAsyncTest {
 
-    private static String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
-    private static String TODO_1_URL = TODOS_URL + "/1";
+    private static final String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
+    private static final String TODO_1_URL = TODOS_URL + "/1";
 
-    private static Parser parser = DefaultParser.create();
+    private static final Parser parser = DefaultParser.create();
 
     @Test
     void standard_java_http_client() {
@@ -52,7 +52,7 @@ public class FluentHttpAsyncTest {
                 .GET()
                 .copy()
                 .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(1))
+                .timeout(Duration.ofSeconds(5))
                 .build();
         HttpClient client = HttpClient.newHttpClient();
 
@@ -75,7 +75,7 @@ public class FluentHttpAsyncTest {
                 .GET()
                 .copy()
                 .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(1))
+                .timeout(Duration.ofSeconds(5))
                 .build();
         SylphHttpClient client = SylphHttpClient.newHttpClient();
 
@@ -90,57 +90,25 @@ public class FluentHttpAsyncTest {
     }
 
     @Test
-    void as_standard_java_http_client_with_BodyHandlers_ofObject() {
-        // given
-        SylphHttpRequest request = SylphHttpRequest.newBuilder()
-                .header("Content-Type", "application/json; charset=utf-8")
-                .uri(TODO_1_URL)
-                .GET()
-                .copy()
-                .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(1))
-                .build();
-        SylphHttpClient client = SylphHttpClient.newHttpClient();
-
-        // when
-        Todo todo = client.sendAsync(request, SylphHttpResponse.BodyHandlers.ofObject(Todo.class, DefaultParser.create()))
-                .join()
-                .body();
-
-        // then
-        AssertTodo.assertResult(todo);
-    }
-
-    @Test
-    void as_standard_java_http_client_with_BodyHandlers_ofObjects() {
-        // given
-        SylphHttpRequest request = SylphHttpRequest.newBuilder()
-                .header("Content-Type", "application/json; charset=utf-8")
-                .uri(TODOS_URL)
-                .GET()
-                .copy()
-                .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(1))
-                .build();
-        SylphHttpClient client = SylphHttpClient.newHttpClient();
-
-        // when
-        List<Todo> todos = client.sendAsync(request, SylphHttpResponse.BodyHandlers.ofList(Todo.class, DefaultParser.create()))
-                .join()
-                .body();
-
-        // then
-        AssertTodo.assertResult(todos);
-    }
-
-    @Test
     void minimal_builder() {
         // when
         Todo todo = Sylph.newClient()
                 .GET(TODO_1_URL)
                 .sendAsync(Todo.class)
                 .join()
-                .body();
+                .asObject();
+
+        // then
+        AssertTodo.assertResult(todo);
+    }
+
+    @Test
+    void minimal_builder_shortcut() {
+        // when
+        Todo todo = Sylph.newClient()
+                .GET(TODO_1_URL)
+                .bodyAsync(Todo.class)
+                .join();
 
         // then
         AssertTodo.assertResult(todo);
@@ -148,6 +116,19 @@ public class FluentHttpAsyncTest {
 
     @Test
     void minimal_builder_list() {
+        // when
+        List<Todo> todos = Sylph.newClient()
+                .GET(TODOS_URL)
+                .sendAsync(Todo.class)
+                .join()
+                .asList();
+
+        // then
+        AssertTodo.assertResult(todos);
+    }
+
+    @Test
+    void minimal_builder_list_shortcut() {
         // when
         List<Todo> todos = Sylph.newClient()
                 .GET(TODOS_URL)
@@ -178,7 +159,7 @@ public class FluentHttpAsyncTest {
         // when
         Todo responseBody = http.sendAsync(Todo.class)
                 .join()
-                .body();
+                .asObject();
 
         // then
         AssertTodo.assertResult(responseBody);
@@ -198,7 +179,7 @@ public class FluentHttpAsyncTest {
                 .POST(TODOS_URL, todo)
                 .sendAsync(Todo.class)
                 .join()
-                .body();
+                .asObject();
 
         // then
         Assertions.assertNotEquals(todoResult.getId(), todo.getId());
@@ -214,7 +195,7 @@ public class FluentHttpAsyncTest {
                 .PUT(TODOS_URL + "/" + todo.getId(), todo)
                 .sendAsync(Todo.class)
                 .join()
-                .body();
+                .asObject();
 
         // then
         Assertions.assertEquals(todoResult.getId(), todo.getId());
@@ -227,7 +208,7 @@ public class FluentHttpAsyncTest {
                 .DELETE(TODOS_URL + "/44")
                 .sendAsync(Todo.class)
                 .join()
-                .body();
+                .asObject();
 
         // then
         Assertions.assertEquals(todoResult.getId(), 0);

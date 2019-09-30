@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import fr.monbanquet.sylph.SylphException;
+import fr.monbanquet.sylph.exception.SylphException;
 
 import java.io.IOException;
 import java.util.List;

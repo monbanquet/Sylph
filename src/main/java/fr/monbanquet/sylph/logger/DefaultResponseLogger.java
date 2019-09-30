@@ -31,27 +31,36 @@ import java.util.stream.Collectors;
 
 public class DefaultResponseLogger implements ResponseLogger {
 
-    private static Logger log = LoggerFactory.getLogger(DefaultResponseLogger.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultRequestLogger.class);
+
+    private final SylphLogger level;
+
+    DefaultResponseLogger() {
+        this.level = SylphLogger.DEBUG;
+    }
+
+    DefaultResponseLogger(SylphLogger level) {
+        this.level = level;
+    }
 
     public static ResponseLogger create() {
         return new DefaultResponseLogger();
     }
 
-    public <T> HttpResponse<T> log(HttpResponse<T> response) {
-        if (log.isDebugEnabled()) {
-            String requestHeaders = response.request().headers().map().entrySet().stream()
-                    .map(entry -> entry.getKey() + ":" + entry.getValue())
-                    .collect(Collectors.joining(", "));
-            log.debug(" - Request Headers : {}", requestHeaders);
-            log.debug(" - Request Method : {}", response.request().method());
-            log.debug(" - Request URI : {}", response.request().uri());
+    public static ResponseLogger create(SylphLogger level) {
+        return new DefaultResponseLogger(level);
+    }
 
+    public <T> HttpResponse<T> log(HttpResponse<T> response) {
+        if (level.isEnabled(logger)) {
             String responseHeader = response.headers().map().entrySet().stream()
                     .map(entry -> entry.getKey() + ":" + entry.getValue())
                     .collect(Collectors.joining(", "));
-            log.debug(" - Response Headers : {}", responseHeader);
-            log.debug(" - Response Status Code: {}", response.statusCode());
-            log.debug(" - Response Body : {}", response.body());
+            if (!responseHeader.isBlank()) {
+                level.prepare(logger).log(" - Response Headers : {}", responseHeader);
+            }
+            level.prepare(logger).log(" - Response Status Code: {}", response.statusCode());
+            level.prepare(logger).log(" - Response Body : {}", response.body());
         }
         return response;
     }

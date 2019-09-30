@@ -23,27 +23,21 @@
  */
 package fr.monbanquet.sylph;
 
-import fr.monbanquet.sylph.delegate.HttpRequestDelegate;
+import java.net.http.HttpResponse;
+import java.util.List;
 
-import java.net.URI;
-import java.net.http.HttpRequest;
+public class SylphHttpResponseSimple<T> extends SylphHttpResponse<T, T> {
 
-public class SylphHttpRequest extends HttpRequestDelegate {
-
-    SylphHttpRequest(HttpRequest request) {
-        this.request = request;
+    public SylphHttpResponseSimple(HttpResponse<T> response) {
+        super(response);
     }
 
-    public static SylphHttpRequestBuilder newBuilder(String uri) {
-        return newBuilder(URI.create(uri));
+    public T asObject() {
+        throw new UnsupportedOperationException();
     }
 
-    public static SylphHttpRequestBuilder newBuilder(URI uri) {
-        return SylphHttpRequestBuilder.newBuilder(uri);
-    }
-
-    public static SylphHttpRequestBuilder newBuilder() {
-        return SylphHttpRequestBuilder.newBuilder();
+    public List<T> asList() {
+        throw new UnsupportedOperationException();
     }
 
 }

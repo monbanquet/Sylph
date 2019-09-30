@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.monbanquet.sylph;
+package fr.monbanquet.sylph.exception;
 
 public class SylphException extends RuntimeException {
     public SylphException() {

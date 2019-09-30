@@ -23,6 +23,8 @@
  */
 package fr.monbanquet.sylph;
 
+import fr.monbanquet.sylph.delegate.HttpClientBuilderDelegate;
+import fr.monbanquet.sylph.logger.RequestLogger;
 import fr.monbanquet.sylph.logger.ResponseLogger;
 import fr.monbanquet.sylph.parser.Parser;
 import fr.monbanquet.sylph.processor.ResponseProcessor;
@@ -37,10 +39,11 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 
-public class SylphHttpClientBuilder implements HttpClient.Builder {
+public class SylphHttpClientBuilder extends HttpClientBuilderDelegate {
 
     private SylphHttpRequestBuilder baseRequest;
     private Parser parser;
+    private RequestLogger requestLogger;
     private ResponseLogger responseLogger;
     private ResponseProcessor responseProcessor;
 
@@ -52,16 +55,18 @@ public class SylphHttpClientBuilder implements HttpClient.Builder {
     public SylphHttpClient build() {
         Objects.requireNonNull(baseRequest, "Client require a BaseRequest");
         Objects.requireNonNull(parser, "Client require a Parser");
+        Objects.requireNonNull(requestLogger, "Client require a RequestLogger");
         Objects.requireNonNull(responseLogger, "Client require a ResponseLogger");
         Objects.requireNonNull(responseProcessor, "Client require a ResponseProcessor");
         HttpClient client = builder.build();
-        SylphHttpClient fluentClient = new SylphHttpClient();
-        fluentClient.setBaseRequest(baseRequest);
-        fluentClient.setHttpClient(client);
-        fluentClient.setParser(parser);
-        fluentClient.setResponseLogger(responseLogger);
-        fluentClient.setResponseProcessor(responseProcessor);
-        return fluentClient;
+        SylphHttpClient sylphClient = new SylphHttpClient();
+        sylphClient.setBaseRequest(baseRequest);
+        sylphClient.setHttpClient(client);
+        sylphClient.setParser(parser);
+        sylphClient.setRequestLogger(requestLogger);
+        sylphClient.setResponseLogger(responseLogger);
+        sylphClient.setResponseProcessor(responseProcessor);
+        return sylphClient;
     }
 
     void baseRequest(SylphHttpRequestBuilder baseRequest) {
@@ -72,6 +77,10 @@ public class SylphHttpClientBuilder implements HttpClient.Builder {
         this.parser = parser;
     }
 
+    void requestLogger(RequestLogger requestLogger) {
+        this.requestLogger = requestLogger;
+    }
+
     void responseLogger(ResponseLogger responseLogger) {
         this.responseLogger = responseLogger;
     }
@@ -80,9 +89,7 @@ public class SylphHttpClientBuilder implements HttpClient.Builder {
         this.responseProcessor = responseProcessor;
     }
 
-    // --- Delegate HttpClient.Builder --- //
-
-    private HttpClient.Builder builder = HttpClient.newBuilder();
+    // ---  --- //
 
     @Override
     public SylphHttpClientBuilder cookieHandler(CookieHandler cookieHandler) {
