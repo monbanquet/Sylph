@@ -23,12 +23,12 @@
  */
 package fr.monbanquet.sylph;
 
+import fr.monbanquet.sylph.helpers.AssertTodo;
+import fr.monbanquet.sylph.helpers.Todo;
 import fr.monbanquet.sylph.parser.DefaultParser;
 import fr.monbanquet.sylph.parser.Parser;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -36,7 +36,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
 
-public class SylphHttpClientAsyncTest {
+public class SylphHttpClientTestSendMethodsAsync {
 
     private static final String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
     private static final String TODO_1_URL = TODOS_URL + "/1";
@@ -44,32 +44,9 @@ public class SylphHttpClientAsyncTest {
     private static final Parser parser = DefaultParser.create();
 
     @Test
-    void standard_java_http_client() {
+    void send_with_request_param_and_responseBodyHandler_param() {
         // given
         HttpRequest request = HttpRequest.newBuilder()
-                .header("Content-Type", "application/json; charset=utf-8")
-                .uri(URI.create(TODO_1_URL))
-                .GET()
-                .copy()
-                .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(5))
-                .build();
-        HttpClient client = HttpClient.newHttpClient();
-
-        // when
-        HttpResponse<String> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .join();
-
-        // then
-        String body = response.body();
-        Todo todo = parser.deserialize(body, Todo.class);
-        AssertTodo.assertResult(todo);
-    }
-
-    @Test
-    void as_standard_java_http_client() throws IOException {
-        // given
-        SylphHttpRequest request = SylphHttpRequest.newBuilder()
                 .header("Content-Type", "application/json; charset=utf-8")
                 .uri(URI.create(TODO_1_URL))
                 .GET()
@@ -89,8 +66,55 @@ public class SylphHttpClientAsyncTest {
         AssertTodo.assertResult(todo);
     }
 
+
     @Test
-    void minimal_builder() {
+    void send_with_responseBodyHandler_param() {
+        // given
+        SylphHttpClient client = Sylph.builder()
+                .setBaseRequest(SylphHttpRequest.newBuilder()
+                        .header("Content-Type", "application/json; charset=utf-8")
+                        .uri(URI.create(TODO_1_URL))
+                        .GET()
+                        .copy()
+                        .version(HttpClient.Version.HTTP_2)
+                        .timeout(Duration.ofSeconds(5)))
+                .getClient();
+
+        // when
+        SylphHttpResponse<String, String> response = client.sendAsync(HttpResponse.BodyHandlers.ofString())
+                .join();
+
+        // then
+        String body = response.body();
+        Todo todo = parser.deserialize(body, Todo.class);
+        AssertTodo.assertResult(todo);
+    }
+
+
+    @Test
+    void send_with_request_param_and_returnType_param() {
+        // given
+        HttpRequest request = HttpRequest.newBuilder()
+                .header("Content-Type", "application/json; charset=utf-8")
+                .uri(URI.create(TODO_1_URL))
+                .GET()
+                .copy()
+                .version(HttpClient.Version.HTTP_2)
+                .timeout(Duration.ofSeconds(5))
+                .build();
+        SylphHttpClient client = SylphHttpClient.newHttpClient();
+
+        // when
+        SylphHttpResponse<String, Todo> response = client.sendAsync(request, Todo.class)
+                .join();
+
+        // then
+        Todo todo = response.asObject();
+        AssertTodo.assertResult(todo);
+    }
+
+    @Test
+    void send_with_returnType_object_param() {
         // when
         Todo todo = Sylph.newClient()
                 .GET(TODO_1_URL)
@@ -103,7 +127,20 @@ public class SylphHttpClientAsyncTest {
     }
 
     @Test
-    void minimal_builder_shortcut() {
+    void send_with_returnType_list_param() {
+        // when
+        Todo todo = Sylph.newClient()
+                .GET(TODO_1_URL)
+                .sendAsync(Todo.class)
+                .join()
+                .asObject();
+
+        // then
+        AssertTodo.assertResult(todo);
+    }
+
+    @Test
+    void body_with_returnType_param() {
         // when
         Todo todo = Sylph.newClient()
                 .GET(TODO_1_URL)
@@ -115,20 +152,7 @@ public class SylphHttpClientAsyncTest {
     }
 
     @Test
-    void minimal_builder_list() {
-        // when
-        List<Todo> todos = Sylph.newClient()
-                .GET(TODOS_URL)
-                .sendAsync(Todo.class)
-                .join()
-                .asList();
-
-        // then
-        AssertTodo.assertResult(todos);
-    }
-
-    @Test
-    void minimal_builder_list_shortcut() {
+    void bodyList_with_returnType_param() {
         // when
         List<Todo> todos = Sylph.newClient()
                 .GET(TODOS_URL)
@@ -137,81 +161,6 @@ public class SylphHttpClientAsyncTest {
 
         // then
         AssertTodo.assertResult(todos);
-    }
-
-    @Test
-    void all_methods_builder() {
-        // given
-        SylphHttpClient http = Sylph.builder()
-                .setBaseRequest(SylphHttpRequest.newBuilder()
-                        .uri(TODO_1_URL)
-                        .copy()
-                        .GET()
-                        .version(HttpClient.Version.HTTP_2))
-                .setClient(SylphHttpClient.newBuilder()
-                        .priority(1)
-                        .version(HttpClient.Version.HTTP_2)
-                        .followRedirects(HttpClient.Redirect.ALWAYS)
-                )
-                .setParser(DefaultParser.create())
-                .getClient();
-
-        // when
-        Todo responseBody = http.sendAsync(Todo.class)
-                .join()
-                .asObject();
-
-        // then
-        AssertTodo.assertResult(responseBody);
-    }
-
-    @Test
-    void post() {
-        // given
-        Todo todo = Helper.newTodoExtended();
-
-        Parser p = DefaultParser.create();
-
-        String s = p.serialize(todo);
-
-        // when
-        Todo todoResult = Sylph.newClient()
-                .POST(TODOS_URL, todo)
-                .sendAsync(Todo.class)
-                .join()
-                .asObject();
-
-        // then
-        Assertions.assertNotEquals(todoResult.getId(), todo.getId());
-    }
-
-    @Test
-    void put() {
-        // given
-        Todo todo = Helper.newTodo();
-
-        // when
-        Todo todoResult = Sylph.newClient()
-                .PUT(TODOS_URL + "/" + todo.getId(), todo)
-                .sendAsync(Todo.class)
-                .join()
-                .asObject();
-
-        // then
-        Assertions.assertEquals(todoResult.getId(), todo.getId());
-    }
-
-    @Test
-    void delete() {
-        // when
-        Todo todoResult = Sylph.newClient()
-                .DELETE(TODOS_URL + "/44")
-                .sendAsync(Todo.class)
-                .join()
-                .asObject();
-
-        // then
-        Assertions.assertEquals(todoResult.getId(), 0);
     }
 
 }

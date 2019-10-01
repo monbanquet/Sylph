@@ -20,7 +20,7 @@ Sylph add new features, remove repetitive codes and keep same method signature o
 - New builders 
 - Default JSON converter
 - Custom response processing
-- Logs request and response
+- Custom request and response logs
 - An URL Builder
 - All Exception are convert to RuntimeException 
 

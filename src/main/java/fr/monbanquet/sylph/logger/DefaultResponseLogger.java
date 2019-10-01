@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 
 public class DefaultResponseLogger implements ResponseLogger {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultRequestLogger.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultResponseLogger.class);
 
     private final SylphLogger level;
 

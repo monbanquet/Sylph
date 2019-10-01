@@ -23,15 +23,14 @@
  */
 package fr.monbanquet.sylph.parser;
 
-import fr.monbanquet.sylph.Helper;
-import fr.monbanquet.sylph.TodoExtended;
+import fr.monbanquet.sylph.helpers.Helper;
+import fr.monbanquet.sylph.helpers.TodoExtended;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 

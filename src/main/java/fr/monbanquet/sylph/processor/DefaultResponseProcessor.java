@@ -24,7 +24,6 @@
 package fr.monbanquet.sylph.processor;
 
 import fr.monbanquet.sylph.exception.SylphHttpResponseException;
-import fr.monbanquet.sylph.logger.DefaultResponseLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +31,7 @@ import java.net.http.HttpResponse;
 
 public class DefaultResponseProcessor implements ResponseProcessor {
 
-    private static Logger log = LoggerFactory.getLogger(DefaultResponseLogger.class);
+    private static Logger log = LoggerFactory.getLogger(DefaultResponseProcessor.class);
 
     public static ResponseProcessor create() {
         return new DefaultResponseProcessor();

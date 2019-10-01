@@ -23,7 +23,7 @@
  */
 package fr.monbanquet.sylph;
 
-import fr.monbanquet.sylph.logger.DefaultResponseLogger;
+import fr.monbanquet.sylph.helpers.Todo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ import java.util.stream.IntStream;
 
 class SylphHttpClientBulkTest {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultResponseLogger.class);
+    private static final Logger log = LoggerFactory.getLogger(SylphHttpClientBulkTest.class);
 
     private static final String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
 

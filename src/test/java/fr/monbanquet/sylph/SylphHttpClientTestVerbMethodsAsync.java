@@ -23,23 +23,26 @@
  */
 package fr.monbanquet.sylph;
 
+import fr.monbanquet.sylph.helpers.AssertTodo;
+import fr.monbanquet.sylph.helpers.Helper;
+import fr.monbanquet.sylph.helpers.Todo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
-import java.util.List;
 
-class SylphHttpClientTest {
+class SylphHttpClientTestVerbMethodsAsync {
 
     private static final String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
     private static final String TODO_1_URL = TODOS_URL + "/1";
 
     @Test
-    void get_with_url_string() {
+    void get_with_url_string_param() {
         // when
         Todo todo = Sylph.newClient()
                 .GET(TODO_1_URL)
-                .send(Todo.class)
+                .sendAsync(Todo.class)
+                .join()
                 .asObject();
 
         // then
@@ -47,11 +50,12 @@ class SylphHttpClientTest {
     }
 
     @Test
-    void get_with_uri() {
+    void get_with_uri_param() {
         // when
         Todo todo = Sylph.newClient()
                 .GET(URI.create(TODO_1_URL))
-                .send(Todo.class)
+                .sendAsync(Todo.class)
+                .join()
                 .asObject();
 
         // then
@@ -59,11 +63,12 @@ class SylphHttpClientTest {
     }
 
     @Test
-    void post_with_url_string() {
+    void post_with_url_string_param() {
         // when
         Todo todoResult = Sylph.newClient()
                 .POST(TODOS_URL)
-                .send(Todo.class)
+                .sendAsync(Todo.class)
+                .join()
                 .asObject();
 
         // then
@@ -74,26 +79,31 @@ class SylphHttpClientTest {
     }
 
     @Test
-    void post_with_uri() {
+    void post_with_uri_param() {
         // when
         Todo todoResult = newClient()
                 .POST(URI.create(TODOS_URL))
-                .send(Todo.class)
+                .sendAsync(Todo.class)
+                .join()
                 .asObject();
 
         // then
         Assertions.assertNotEquals(todoResult.getId(), 0);
+        Assertions.assertEquals(todoResult.getUserId(), 0);
+        Assertions.assertNull(todoResult.getTitle());
+        Assertions.assertFalse(todoResult.isCompleted());
     }
 
     @Test
-    void post_with_url_string_and_body_object() {
+    void post_with_url_string_param_and_body_object_param() {
         // given
         Todo todo = Helper.newTodo();
 
         // when
         Todo todoResult = newClient()
                 .POST(TODOS_URL, todo)
-                .send(Todo.class)
+                .sendAsync(Todo.class)
+                .join()
                 .asObject();
 
         // then
@@ -101,14 +111,15 @@ class SylphHttpClientTest {
     }
 
     @Test
-    void post_with_uri_and_body_object() {
+    void post_with_uri_param_and_body_object_param() {
         // given
         Todo todo = Helper.newTodo();
 
         // when
         Todo todoResult = newClient()
                 .POST(URI.create(TODOS_URL), todo)
-                .send(Todo.class)
+                .sendAsync(Todo.class)
+                .join()
                 .asObject();
 
         // then
@@ -116,14 +127,15 @@ class SylphHttpClientTest {
     }
 
     @Test
-    void put_with_url_string() {
+    void put_with_url_string_param() {
         // given
         int id = 42;
 
         // when
         Todo todoResult = newClient()
                 .PUT(TODOS_URL + "/" + id)
-                .send(Todo.class)
+                .sendAsync(Todo.class)
+                .join()
                 .asObject();
 
         // then
@@ -131,14 +143,15 @@ class SylphHttpClientTest {
     }
 
     @Test
-    void put_with_uri() {
+    void put_with_uri_param() {
         // given
         int id = 42;
 
         // when
         Todo todoResult = newClient()
                 .PUT(TODOS_URL + "/" + id)
-                .send(Todo.class)
+                .sendAsync(Todo.class)
+                .join()
                 .asObject();
 
         // then
@@ -146,7 +159,7 @@ class SylphHttpClientTest {
     }
 
     @Test
-    void put_with_url_string_and_body_object() {
+    void put_with_url_string_param_and_body_object_param() {
         // given
         int id = 42;
         Todo todo = Helper.newTodo();
@@ -154,7 +167,8 @@ class SylphHttpClientTest {
         // when
         Todo todoResult = newClient()
                 .PUT(TODOS_URL + "/" + id, todo)
-                .send(Todo.class)
+                .sendAsync(Todo.class)
+                .join()
                 .asObject();
 
         // then
@@ -162,7 +176,7 @@ class SylphHttpClientTest {
     }
 
     @Test
-    void put_with_uri_and_body_object() {
+    void put_with_uri_param_and_body_object_param() {
         // given
         int id = 42;
         Todo todo = Helper.newTodo();
@@ -170,7 +184,8 @@ class SylphHttpClientTest {
         // when
         Todo todoResult = newClient()
                 .PUT(URI.create(TODOS_URL + "/" + id), todo)
-                .send(Todo.class)
+                .sendAsync(Todo.class)
+                .join()
                 .asObject();
 
         // then
@@ -178,51 +193,28 @@ class SylphHttpClientTest {
     }
 
     @Test
-    void delete_with_string() {
+    void delete_with_string_param() {
         // when
         Todo todoResult = newClient()
                 .DELETE(TODOS_URL + "/44")
-                .body(Todo.class);
+                .bodyAsync(Todo.class)
+                .join();
 
         // then
         Assertions.assertEquals(todoResult.getId(), 0);
     }
 
     @Test
-    void delete_with_uri() {
+    void delete_with_uri_param() {
         // when
         Todo todoResult = newClient()
                 .DELETE(URI.create(TODOS_URL + "/44"))
-                .send(Todo.class)
+                .sendAsync(Todo.class)
+                .join()
                 .asObject();
 
         // then
         Assertions.assertEquals(todoResult.getId(), 0);
-    }
-
-    @Test
-    void body_object_shortcut() {
-        // given
-        Todo todo = Helper.newTodo();
-
-        // when
-        Todo todoResult = newClient()
-                .POST(TODOS_URL, todo)
-                .body(Todo.class);
-
-        // then
-        Assertions.assertNotEquals(todoResult.getId(), todo.getId());
-    }
-
-    @Test
-    void body_list_shortcut() {
-        // when
-        List<Todo> todos = newClient()
-                .GET(TODOS_URL)
-                .bodyList(Todo.class);
-
-        // then
-        AssertTodo.assertResult(todos);
     }
 
     private SylphHttpClient newClient() {

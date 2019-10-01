@@ -29,13 +29,13 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Objects;
 
-public class SylphHttpResponseTransform<T> extends SylphHttpResponse<String, T> {
+public class SylphHttpResponseWithTransform<T> extends SylphHttpResponse<String, T> {
 
     private final HttpResponse<String> response;
     private final Class<T> bodyType;
     private final Parser parser;
 
-    public SylphHttpResponseTransform(HttpResponse<String> response, Class<T> bodyType, Parser parser) {
+    public SylphHttpResponseWithTransform(HttpResponse<String> response, Class<T> bodyType, Parser parser) {
         super(response);
         this.response = response;
         this.bodyType = bodyType;

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.monbanquet.sylph;
+package fr.monbanquet.sylph.helpers;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

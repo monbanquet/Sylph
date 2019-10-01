@@ -172,11 +172,11 @@ public class SylphHttpClient extends HttpClientDelegate {
     }
 
     public <T> SylphHttpResponse<String, T> send(HttpRequest request, Class<T> returnType) {
-        return new SylphHttpResponseTransform<>(doSend(request, HttpResponse.BodyHandlers.ofString()), returnType, parser);
+        return new SylphHttpResponseWithTransform<>(doSend(request, HttpResponse.BodyHandlers.ofString()), returnType, parser);
     }
 
     public <T> SylphHttpResponse<String, T> send(Class<T> returnType) {
-        return new SylphHttpResponseTransform<>(doSend(getRequest(), HttpResponse.BodyHandlers.ofString()), returnType, parser);
+        return new SylphHttpResponseWithTransform<>(doSend(getRequest(), HttpResponse.BodyHandlers.ofString()), returnType, parser);
     }
 
     public SylphHttpResponse<Void, Void> send() {
@@ -209,9 +209,14 @@ public class SylphHttpClient extends HttpClientDelegate {
                 .thenApply(SylphHttpResponseSimple::new);
     }
 
+    public <T> CompletableFuture<SylphHttpResponse<String, T>> sendAsync(HttpRequest request, Class<T> returnType) {
+        return doSendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(response -> new SylphHttpResponseWithTransform<>(response, returnType, parser));
+    }
+
     public <T> CompletableFuture<SylphHttpResponse<String, T>> sendAsync(Class<T> returnType) {
         return doSendAsync(getRequest(), HttpResponse.BodyHandlers.ofString())
-                .thenApply(response -> new SylphHttpResponseTransform<>(response, returnType, parser));
+                .thenApply(response -> new SylphHttpResponseWithTransform<>(response, returnType, parser));
     }
 
     public CompletableFuture<SylphHttpResponse<Void, Void>> sendAsync() {
