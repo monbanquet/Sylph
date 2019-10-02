@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
 
 class SylphHttpClientBulkTest {
@@ -39,36 +38,19 @@ class SylphHttpClientBulkTest {
     private static final String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
 
     @Test
-    void parallel() {
-        IntStream.rangeClosed(1, 100)
+    void sync_need_new_client_each_loop() {
+        IntStream.rangeClosed(1, 50)
                 .parallel()
                 .forEach(i -> {
                     log.info("Start request {}", i);
-                    Todo todo = Sylph.newClient()
+                    SylphHttpClient client = Sylph.newClient();
+                    Todo todo = client
                             .GET(TODOS_URL + "/" + i)
                             .send(Todo.class)
                             .asObject();
                     log.info("End request {}", i);
                     Assertions.assertEquals(todo.getId(), i);
                 });
-    }
-
-    @Test
-    void parallel_async() {
-        IntStream.rangeClosed(1, 100)
-                .parallel()
-                .mapToObj(i -> {
-                    log.info("Start request {}", i);
-                    return Sylph.newClient()
-                            .GET(TODOS_URL + "/" + i)
-                            .sendAsync(Todo.class)
-                            .thenAccept(response -> {
-                                log.info("End request {}", i);
-                                Todo todo = response.asObject();
-                                Assertions.assertEquals(todo.getId(), i);
-                            });
-                })
-                .forEach(CompletableFuture::join);
     }
 
 }
