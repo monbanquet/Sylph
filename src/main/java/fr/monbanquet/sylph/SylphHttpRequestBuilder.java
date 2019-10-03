@@ -43,21 +43,21 @@ public class SylphHttpRequestBuilder implements HttpRequest.Builder {
     public static SylphHttpRequestBuilder newBuilder(URI uri) {
         return new SylphHttpRequestBuilder(
                 HttpRequest.newBuilder(uri)
-                        .header("Content-Type", "application/json")
+                        .header("Content-Type", "application/json; charset=utf-8")
                         .timeout(Duration.ofSeconds(30)));
     }
 
     public static SylphHttpRequestBuilder newBuilder(String uri) {
         return new SylphHttpRequestBuilder(
                 newBuilder(URI.create(uri))
-                        .header("Content-Type", "application/json")
+                        .header("Content-Type", "application/json; charset=utf-8")
                         .timeout(Duration.ofSeconds(30)));
     }
 
     public static SylphHttpRequestBuilder newBuilder() {
         return new SylphHttpRequestBuilder(
                 HttpRequest.newBuilder()
-                        .header("Content-Type", "application/json")
+                        .header("Content-Type", "application/json; charset=utf-8")
                         .timeout(Duration.ofSeconds(30)));
     }
 
