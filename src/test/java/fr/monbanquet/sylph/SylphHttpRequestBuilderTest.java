@@ -30,6 +30,11 @@ import fr.monbanquet.sylph.parser.Parser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+
+import static fr.monbanquet.sylph.SylphHttpRequestBuilder.HEADER_CONTENT_TYPE;
+import static fr.monbanquet.sylph.SylphHttpRequestBuilder.HEADER_CONTENT_TYPE_VALUE;
+
 class SylphHttpRequestBuilderTest {
 
     private static final String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
@@ -114,5 +119,49 @@ class SylphHttpRequestBuilderTest {
 
         // then
         Assertions.assertEquals(todoResult.getId(), todo.getId());
+    }
+
+    @Test
+    void request_should_have_default_content_type_if_not_set() {
+        SylphHttpRequest request = SylphHttpRequest.newBuilder("https://fake.com").build();
+        Assertions.assertEquals(1, request.headers().allValues(HEADER_CONTENT_TYPE).size());
+        Assertions.assertEquals(HEADER_CONTENT_TYPE_VALUE, request.headers().firstValue(HEADER_CONTENT_TYPE).get());
+    }
+
+    @Test
+    void request_should_have_content_type_if_set() {
+        String contentTypeValue = "ABC";
+        SylphHttpRequest request = SylphHttpRequest.newBuilder("https://fake.com")
+                .header(HEADER_CONTENT_TYPE, contentTypeValue)
+                .build();
+        Assertions.assertEquals(1, request.headers().allValues(HEADER_CONTENT_TYPE).size());
+        Assertions.assertEquals(contentTypeValue, request.headers().firstValue(HEADER_CONTENT_TYPE).get());
+    }
+
+    @Test
+    void request_should_have_default_content_type_if_other_header_is_set() {
+        String headerKey = "123";
+        String headerValue = "ABC";
+        SylphHttpRequest request = SylphHttpRequest.newBuilder("https://fake.com")
+                .header(headerKey, headerValue)
+                .build();
+        Assertions.assertEquals(1, request.headers().allValues(HEADER_CONTENT_TYPE).size());
+        Assertions.assertEquals(HEADER_CONTENT_TYPE_VALUE, request.headers().firstValue(HEADER_CONTENT_TYPE).get());
+        Assertions.assertEquals(1, request.headers().allValues(headerKey).size());
+        Assertions.assertEquals(headerValue, request.headers().firstValue(headerKey).get());
+    }
+
+    @Test
+    void request_should_have_default_timeout_if_not_set() {
+        SylphHttpRequest request = SylphHttpRequest.newBuilder("https://fake.com").build();
+        Assertions.assertEquals(Duration.ofSeconds(30), request.timeout().get());
+    }
+
+    @Test
+    void request_should_have_timeout_if_set() {
+        SylphHttpRequest request = SylphHttpRequest.newBuilder("https://fake.com")
+                .timeout(Duration.ofHours(24))
+                .build();
+        Assertions.assertEquals(Duration.ofHours(24), request.timeout().get());
     }
 }

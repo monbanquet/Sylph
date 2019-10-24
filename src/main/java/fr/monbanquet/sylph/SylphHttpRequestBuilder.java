@@ -30,35 +30,33 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class SylphHttpRequestBuilder extends HttpRequestBuilderDelegate {
 
     protected Parser parser;
 
+    protected static final String HEADER_CONTENT_TYPE = "Content-Type";
+    protected static final String HEADER_CONTENT_TYPE_VALUE = "application/json; charset=utf-8";
+    protected boolean hasContentType = false;
+    protected boolean hasTimeout = false;
+
+
     SylphHttpRequestBuilder(HttpRequest.Builder internalBuilder) {
         super(internalBuilder);
     }
 
     public static SylphHttpRequestBuilder newBuilder(URI uri) {
-        return new SylphHttpRequestBuilder(
-                HttpRequest.newBuilder(uri)
-                        .header("Content-Type", "application/json")
-                        .timeout(Duration.ofSeconds(30)));
+        return new SylphHttpRequestBuilder(HttpRequest.newBuilder(uri));
     }
 
     public static SylphHttpRequestBuilder newBuilder(String uri) {
-        return new SylphHttpRequestBuilder(
-                newBuilder(URI.create(uri))
-                        .header("Content-Type", "application/json")
-                        .timeout(Duration.ofSeconds(30)));
+        return new SylphHttpRequestBuilder(newBuilder(URI.create(uri)));
     }
 
     public static SylphHttpRequestBuilder newBuilder() {
-        return new SylphHttpRequestBuilder(
-                HttpRequest.newBuilder()
-                        .header("Content-Type", "application/json")
-                        .timeout(Duration.ofSeconds(30)));
+        return new SylphHttpRequestBuilder(HttpRequest.newBuilder());
     }
 
     // ---  --- //
@@ -89,6 +87,12 @@ public class SylphHttpRequestBuilder extends HttpRequestBuilderDelegate {
 
     @Override
     public SylphHttpRequest build() {
+        if (!hasContentType) {
+            builder.header(HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_VALUE);
+        }
+        if (!hasTimeout) {
+            builder.timeout(Duration.ofSeconds(30));
+        }
         return new SylphHttpRequest(builder.build());
     }
 
@@ -120,18 +124,27 @@ public class SylphHttpRequestBuilder extends HttpRequestBuilderDelegate {
     @Override
     public SylphHttpRequestBuilder header(String name, String value) {
         this.builder.header(name, value);
+        if (HEADER_CONTENT_TYPE.equals(name)) {
+            this.hasContentType = true;
+        }
         return this;
     }
 
     @Override
     public SylphHttpRequestBuilder headers(String... headers) {
         this.builder.headers(headers);
+        Arrays.stream(headers).forEach(header -> {
+            if (Objects.nonNull(header) && header.contains(HEADER_CONTENT_TYPE)) {
+                this.hasContentType = true;
+            }
+        });
         return this;
     }
 
     @Override
     public SylphHttpRequestBuilder timeout(Duration duration) {
         this.builder.timeout(duration);
+        this.hasTimeout = true;
         return this;
     }
 
