@@ -40,7 +40,7 @@ public class SylphHttpRequestException extends SylphException {
 
     @Override
     public String getMessage() {
-        return MessageFormat.format("Error while executing call {0};{1} : error={2}",
+        return MessageFormat.format("Error while executing call {0}; {1} : error={2}",
                 requestMethod, requestUri, super.getMessage());
     }
 

@@ -60,7 +60,7 @@ public class SylphHttpClientBuilder extends HttpClientBuilderDelegate {
         Objects.requireNonNull(responseProcessor, "Client require a ResponseProcessor");
         HttpClient client = builder.build();
         SylphHttpClient sylphClient = new SylphHttpClient();
-        sylphClient.setBaseRequest(baseRequest);
+        sylphClient.setBaseRequestBuilder(baseRequest);
         sylphClient.setHttpClient(client);
         sylphClient.setParser(parser);
         sylphClient.setRequestLogger(requestLogger);

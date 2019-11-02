@@ -44,7 +44,7 @@ public class SylphHttpResponseException extends RuntimeException implements Seri
 
     @Override
     public String getMessage() {
-        return MessageFormat.format("Error while executing call {0};{1} : responseCode={2}, errorBody={3}",
+        return MessageFormat.format("Error while executing call {0}; {1} : responseCode={2}, errorBody={3}",
                 requestMethod, requestUri, responseCode, errorBody);
     }
 
