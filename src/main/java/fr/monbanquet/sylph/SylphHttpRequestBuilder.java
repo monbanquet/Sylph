@@ -30,8 +30,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 
 public class SylphHttpRequestBuilder extends HttpRequestBuilderDelegate {
 
@@ -94,6 +93,11 @@ public class SylphHttpRequestBuilder extends HttpRequestBuilderDelegate {
             builder.timeout(Duration.ofSeconds(30));
         }
         return new SylphHttpRequest(builder.build());
+    }
+
+    @Override
+    public SylphHttpRequestBuilder copy() {
+        return new SylphHttpRequestBuilder(this.builder.copy());
     }
 
     SylphHttpRequestBuilder parser(Parser parser) {
@@ -181,12 +185,6 @@ public class SylphHttpRequestBuilder extends HttpRequestBuilderDelegate {
     @Override
     public SylphHttpRequestBuilder method(String method, HttpRequest.BodyPublisher bodyPublisher) {
         this.builder.method(method, bodyPublisher);
-        return this;
-    }
-
-    @Override
-    public SylphHttpRequestBuilder copy() {
-        this.builder.copy();
         return this;
     }
 

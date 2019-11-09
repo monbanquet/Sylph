@@ -36,12 +36,12 @@ import java.util.Objects;
 
 public class Sylph {
 
-    private SylphHttpRequestBuilder baseRequest;
-    private Parser parser;
-    private RequestLogger requestLogger;
-    private ResponseLogger responseLogger;
-    private ResponseProcessor responseProcessor;
-    private SylphHttpClientBuilder client;
+    private SylphHttpRequestBuilder internalBaseRequest;
+    private Parser internalParser;
+    private RequestLogger internalRequestLogger;
+    private ResponseLogger internalResponseLogger;
+    private ResponseProcessor internalResponseProcessor;
+    private SylphHttpClientBuilder internalClient;
 
     public static Sylph builder() {
         return new Sylph();
@@ -52,30 +52,37 @@ public class Sylph {
     }
 
     public SylphHttpClient getClient() {
-        return this.doBuild();
+        return this.build();
     }
 
-    private SylphHttpClient doBuild() {
+    private SylphHttpClient build() {
 
-        if (Objects.isNull(baseRequest)) {
-            baseRequest = SylphHttpRequestBuilder.newBuilder();
-        }
+        SylphHttpRequestBuilder baseRequest;
+        Parser parser;
+        RequestLogger requestLogger;
+        ResponseLogger responseLogger;
+        ResponseProcessor responseProcessor;
+        SylphHttpClientBuilder client;
 
-        if (Objects.isNull(parser)) {
-            parser = DefaultParser.create();
-        }
+        baseRequest = (Objects.isNull(internalBaseRequest))
+                ? SylphHttpRequestBuilder.newBuilder()
+                : internalBaseRequest;
 
-        if (Objects.isNull(requestLogger)) {
-            requestLogger = DefaultRequestLogger.create();
-        }
+        parser = (Objects.isNull(internalParser))
+                ? DefaultParser.create()
+                : internalParser;
 
-        if (Objects.isNull(responseLogger)) {
-            responseLogger = DefaultResponseLogger.create();
-        }
+        requestLogger = (Objects.isNull(internalRequestLogger))
+                ? DefaultRequestLogger.create()
+                : internalRequestLogger;
 
-        if (Objects.isNull(responseProcessor)) {
-            responseProcessor = DefaultResponseProcessor.create();
-        }
+        responseLogger = (Objects.isNull(internalResponseLogger))
+                ? DefaultResponseLogger.create()
+                : internalResponseLogger;
+
+        responseProcessor = (Objects.isNull(internalResponseProcessor))
+                ? DefaultResponseProcessor.create()
+                : internalResponseProcessor;
 
         baseRequest.parser(parser);
 
@@ -90,33 +97,33 @@ public class Sylph {
     }
 
     public Sylph setBaseRequest(SylphHttpRequestBuilder baseRequest) {
-        this.baseRequest = baseRequest;
+        this.internalBaseRequest = baseRequest;
         return this;
 
     }
 
     public Sylph setClient(SylphHttpClientBuilder clientBuilder) {
-        this.client = clientBuilder;
+        this.internalClient = clientBuilder;
         return this;
     }
 
     public Sylph setParser(Parser parser) {
-        this.parser = parser;
+        this.internalParser = parser;
         return this;
     }
 
-    public Sylph setRequestLogger(RequestLogger requestLogger) {
-        this.requestLogger = requestLogger;
+    public Sylph setRequestLogger(RequestLogger internalRequestLogger) {
+        this.internalRequestLogger = internalRequestLogger;
         return this;
     }
 
     public Sylph setResponseLogger(ResponseLogger responseLogger) {
-        this.responseLogger = responseLogger;
+        this.internalResponseLogger = responseLogger;
         return this;
     }
 
     public Sylph setResponseProcessor(ResponseProcessor responseProcessor) {
-        this.responseProcessor = responseProcessor;
+        this.internalResponseProcessor = responseProcessor;
         return this;
     }
 

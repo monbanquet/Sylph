@@ -39,7 +39,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class SylphHttpClient extends HttpClientDelegate {
 
-    private SylphHttpRequestBuilder baseRequest;
+    private SylphHttpRequestBuilder baseRequestBuilder;
     private Parser parser;
     private RequestLogger requestLogger;
     private ResponseLogger responseLogger;
@@ -61,10 +61,9 @@ public class SylphHttpClient extends HttpClientDelegate {
     }
 
     public SylphHttpClient GET(URI uri) {
-        this.baseRequest = baseRequest.copy()
+        return copy(baseRequestBuilder.copy()
                 .uri(uri)
-                .GET();
-        return this;
+                .GET());
     }
 
     public SylphHttpClient POST(String uri) {
@@ -72,10 +71,9 @@ public class SylphHttpClient extends HttpClientDelegate {
     }
 
     public SylphHttpClient POST(URI uri) {
-        this.baseRequest = baseRequest.copy()
+        return copy(baseRequestBuilder.copy()
                 .uri(uri)
-                .POST(HttpRequest.BodyPublishers.noBody());
-        return this;
+                .POST(HttpRequest.BodyPublishers.noBody()));
     }
 
     public <T> SylphHttpClient POST(String uri, T body) {
@@ -83,29 +81,25 @@ public class SylphHttpClient extends HttpClientDelegate {
     }
 
     public <T> SylphHttpClient POST(URI uri, T body) {
-        baseRequest = baseRequest.copy()
+        return copy(baseRequestBuilder.copy()
                 .uri(uri)
-                .POST(HttpRequest.BodyPublishers.ofString(parser.serialize(body)));
-        return this;
+                .POST(HttpRequest.BodyPublishers.ofString(parser.serialize(body))));
     }
 
     public SylphHttpClient POST(URI uri, HttpRequest.BodyPublisher bodyPublisher) {
-        baseRequest = baseRequest.copy()
+        return copy(baseRequestBuilder.copy()
                 .uri(uri)
-                .POST(bodyPublisher);
-        return this;
+                .POST(bodyPublisher));
     }
 
     public <T> SylphHttpClient POST(T body) {
-        baseRequest = baseRequest.copy()
-                .POST(HttpRequest.BodyPublishers.ofString(parser.serialize(body)));
-        return this;
+        return copy(baseRequestBuilder.copy()
+                .POST(HttpRequest.BodyPublishers.ofString(parser.serialize(body))));
     }
 
     public SylphHttpClient POST(HttpRequest.BodyPublisher bodyPublisher) {
-        baseRequest = baseRequest.copy()
-                .POST(bodyPublisher);
-        return this;
+        return copy(baseRequestBuilder.copy()
+                .POST(bodyPublisher));
     }
 
     public <T> SylphHttpClient PUT(String uri) {
@@ -113,10 +107,9 @@ public class SylphHttpClient extends HttpClientDelegate {
     }
 
     public <T> SylphHttpClient PUT(URI uri) {
-        baseRequest = baseRequest.copy()
+        return copy(baseRequestBuilder.copy()
                 .uri(uri)
-                .PUT(HttpRequest.BodyPublishers.noBody());
-        return this;
+                .PUT(HttpRequest.BodyPublishers.noBody()));
     }
 
     public <T> SylphHttpClient PUT(String uri, T body) {
@@ -124,29 +117,25 @@ public class SylphHttpClient extends HttpClientDelegate {
     }
 
     public <T> SylphHttpClient PUT(URI uri, T body) {
-        baseRequest = baseRequest.copy()
+        return copy(baseRequestBuilder.copy()
                 .uri(uri)
-                .PUT(HttpRequest.BodyPublishers.ofString(parser.serialize(body)));
-        return this;
+                .PUT(HttpRequest.BodyPublishers.ofString(parser.serialize(body))));
     }
 
     public SylphHttpClient PUT(URI uri, HttpRequest.BodyPublisher bodyPublisher) {
-        baseRequest = baseRequest.copy()
+        return copy(baseRequestBuilder.copy()
                 .uri(uri)
-                .PUT(bodyPublisher);
-        return this;
+                .PUT(bodyPublisher));
     }
 
     public <T> SylphHttpClient PUT(T body) {
-        baseRequest = baseRequest.copy()
-                .PUT(HttpRequest.BodyPublishers.ofString(parser.serialize(body)));
-        return this;
+        return copy(baseRequestBuilder.copy()
+                .PUT(HttpRequest.BodyPublishers.ofString(parser.serialize(body))));
     }
 
     public SylphHttpClient PUT(HttpRequest.BodyPublisher bodyPublisher) {
-        baseRequest = baseRequest.copy()
-                .PUT(bodyPublisher);
-        return this;
+        return copy(baseRequestBuilder.copy()
+                .PUT(bodyPublisher));
     }
 
     public SylphHttpClient DELETE(String uri) {
@@ -154,10 +143,9 @@ public class SylphHttpClient extends HttpClientDelegate {
     }
 
     public SylphHttpClient DELETE(URI uri) {
-        baseRequest = baseRequest.copy()
+        return copy(baseRequestBuilder.copy()
                 .uri(uri)
-                .DELETE();
-        return this;
+                .DELETE());
     }
 
     // ---  --- //
@@ -257,12 +245,27 @@ public class SylphHttpClient extends HttpClientDelegate {
 
     // ---  --- //
 
-    private HttpRequest getRequest() {
-        return baseRequest.build();
+    public SylphHttpClient copy() {
+        return copy(baseRequestBuilder.copy());
     }
 
-    public void setBaseRequest(SylphHttpRequestBuilder baseRequest) {
-        this.baseRequest = baseRequest;
+    public SylphHttpClient copy(SylphHttpRequestBuilder requestBuilder) {
+        return Sylph.builder()
+                .setBaseRequest(requestBuilder)
+                .setRequestLogger(requestLogger)
+                .setResponseLogger(responseLogger)
+                .setResponseProcessor(responseProcessor)
+                .getClient();
+    }
+
+    // ---  --- //
+
+    private HttpRequest getRequest() {
+        return baseRequestBuilder.build();
+    }
+
+    public void setBaseRequestBuilder(SylphHttpRequestBuilder baseRequestBuilder) {
+        this.baseRequestBuilder = baseRequestBuilder;
     }
 
     public void setHttpClient(HttpClient httpClient) {

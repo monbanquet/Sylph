@@ -62,13 +62,13 @@ public class HttpRequestBuilderDelegate implements HttpRequest.Builder {
     }
 
     @Override
-    public HttpRequest.Builder timeout(Duration duration) {
-        return builder.timeout(duration);
+    public HttpRequest.Builder setHeader(String name, String value) {
+        return builder.setHeader(name, value);
     }
 
     @Override
-    public HttpRequest.Builder setHeader(String name, String value) {
-        return builder.setHeader(name, value);
+    public HttpRequest.Builder timeout(Duration duration) {
+        return builder.timeout(duration);
     }
 
     @Override
