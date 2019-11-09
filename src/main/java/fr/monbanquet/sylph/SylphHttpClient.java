@@ -64,19 +64,10 @@ public class SylphHttpClient extends HttpClientDelegate {
         return GET(URI.create(uri));
     }
 
-    private Object mutex = new Object();
-
     public SylphHttpClient GET(URI uri) {
-//        SylphHttpRequestBuilder copy = baseRequestBuilder.copy();
-        SylphHttpRequestBuilder request;
-        synchronized (mutex) {
-            logger.info("BEFORE " + uri);
-            request = baseRequestBuilder
-                    .uri(uri)
-                    .GET();
-            logger.info("AFTER " + uri);
-        }
-        return clone(request);
+        return clone(baseRequestBuilder.copy()
+                .uri(uri)
+                .GET());
     }
 
     public SylphHttpClient POST(String uri) {
@@ -260,7 +251,11 @@ public class SylphHttpClient extends HttpClientDelegate {
 
     // ---  --- //
 
-    private SylphHttpClient clone(SylphHttpRequestBuilder baseRequest) {
+    public SylphHttpClient clone() {
+        return clone(baseRequestBuilder.copy());
+    }
+
+    public SylphHttpClient clone(SylphHttpRequestBuilder baseRequest) {
         SylphHttpClient client = new SylphHttpClient();
         client.setHttpClient(httpClient);
         client.setBaseRequestBuilder(baseRequest);
