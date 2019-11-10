@@ -30,20 +30,25 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.time.Duration;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class SylphHttpRequestBuilder extends HttpRequestBuilderDelegate {
 
-    protected Parser parser;
-
     protected static final String HEADER_CONTENT_TYPE = "Content-Type";
     protected static final String HEADER_CONTENT_TYPE_VALUE = "application/json; charset=utf-8";
+    protected Parser parser;
     protected boolean hasContentType = false;
     protected boolean hasTimeout = false;
 
+    SylphHttpRequestBuilder(HttpRequest.Builder internalBuilder, boolean hasContentType, boolean hasTimeout) {
+        super(internalBuilder);
+        this.hasContentType = hasContentType;
+        this.hasTimeout = hasTimeout;
+    }
 
     SylphHttpRequestBuilder(HttpRequest.Builder internalBuilder) {
-        super(internalBuilder);
+        this(internalBuilder, false, false);
     }
 
     public static SylphHttpRequestBuilder newBuilder(URI uri) {
@@ -97,7 +102,11 @@ public class SylphHttpRequestBuilder extends HttpRequestBuilderDelegate {
 
     @Override
     public SylphHttpRequestBuilder copy() {
-        return new SylphHttpRequestBuilder(this.builder.copy());
+        return new SylphHttpRequestBuilder(
+                this.builder.copy(),
+                hasContentType,
+                hasTimeout
+        );
     }
 
     SylphHttpRequestBuilder parser(Parser parser) {

@@ -30,7 +30,12 @@ import fr.monbanquet.sylph.parser.Parser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static fr.monbanquet.sylph.SylphHttpRequestBuilder.HEADER_CONTENT_TYPE;
 import static fr.monbanquet.sylph.SylphHttpRequestBuilder.HEADER_CONTENT_TYPE_VALUE;
@@ -163,5 +168,65 @@ class SylphHttpRequestBuilderTest {
                 .timeout(Duration.ofHours(24))
                 .build();
         Assertions.assertEquals(Duration.ofHours(24), request.timeout().get());
+    }
+
+
+    @Test
+    void copy_should_copy_all_parameters() {
+        // given
+        String uri = "https://monbanquet.fr";
+        String headerKey1 = "header-key1";
+        String headerValue1 = "header-value1";
+        String headerKey2 = "header-key2";
+        String headerValue2 = "header-value2";
+        String method = "POST";
+        HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.ofString("{}");
+        boolean expectContinue = true;
+        Duration timeout = Duration.ofSeconds(456);
+        HttpClient.Version version = HttpClient.Version.HTTP_2;
+
+        SylphHttpRequestBuilder builder = SylphHttpRequestBuilder.newBuilder()
+                .uri(uri)
+                .header(headerKey1, headerValue1)
+                .header(headerKey2, headerValue2)
+                .method(method, bodyPublisher)
+                .expectContinue(expectContinue)
+                .timeout(timeout)
+                .version(version);
+
+        // when
+        SylphHttpRequest copy = builder.copy()
+                .build();
+
+        // then
+        Assertions.assertEquals(uri, copy.uri().toString());
+
+        Map<String, List<String>> headersMap = copy.headers().map();
+        List<String> keys = headersMap.keySet().stream().collect(Collectors.toList());
+
+        Assertions.assertEquals(3, keys.size());
+
+        // always contains Content-Type header
+        Assertions.assertEquals(HEADER_CONTENT_TYPE, keys.get(0));
+        Assertions.assertEquals(1, headersMap.get(HEADER_CONTENT_TYPE).size());
+        Assertions.assertEquals(HEADER_CONTENT_TYPE_VALUE, headersMap.get(HEADER_CONTENT_TYPE).get(0));
+
+        Assertions.assertEquals(headerKey1, keys.get(1));
+        Assertions.assertEquals(1, headersMap.get(headerKey1).size());
+        Assertions.assertEquals(headerValue1, headersMap.get(headerKey1).get(0));
+
+        Assertions.assertEquals(headerKey2, keys.get(2));
+        Assertions.assertEquals(1, headersMap.get(headerKey2).size());
+        Assertions.assertEquals(headerValue2, headersMap.get(headerKey2).get(0));
+
+        Assertions.assertEquals(method, copy.method());
+
+        Assertions.assertEquals(bodyPublisher, copy.bodyPublisher().get());
+
+        Assertions.assertEquals(expectContinue, copy.expectContinue());
+
+        Assertions.assertEquals(timeout, copy.timeout().get());
+
+        Assertions.assertEquals(version, copy.version().get());
     }
 }

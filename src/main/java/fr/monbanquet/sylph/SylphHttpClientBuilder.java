@@ -33,6 +33,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
 import java.net.Authenticator;
 import java.net.CookieHandler;
+import java.net.PasswordAuthentication;
 import java.net.ProxySelector;
 import java.net.http.HttpClient;
 import java.time.Duration;
@@ -41,7 +42,7 @@ import java.util.concurrent.Executor;
 
 public class SylphHttpClientBuilder extends HttpClientBuilderDelegate {
 
-    private SylphHttpRequestBuilder baseRequest;
+    private SylphHttpRequestBuilder baseRequestBuilder;
     private Parser parser;
     private RequestLogger requestLogger;
     private ResponseLogger responseLogger;
@@ -53,24 +54,36 @@ public class SylphHttpClientBuilder extends HttpClientBuilderDelegate {
 
     @Override
     public SylphHttpClient build() {
-        Objects.requireNonNull(baseRequest, "Client require a BaseRequest");
+        Objects.requireNonNull(baseRequestBuilder, "Client require a BaseRequestBuilder");
         Objects.requireNonNull(parser, "Client require a Parser");
         Objects.requireNonNull(requestLogger, "Client require a RequestLogger");
         Objects.requireNonNull(responseLogger, "Client require a ResponseLogger");
         Objects.requireNonNull(responseProcessor, "Client require a ResponseProcessor");
         HttpClient client = builder.build();
         SylphHttpClient sylphClient = new SylphHttpClient();
-        sylphClient.setBaseRequestBuilder(baseRequest);
-        sylphClient.setHttpClient(client);
+        sylphClient.setBaseRequestBuilder(baseRequestBuilder);
         sylphClient.setParser(parser);
         sylphClient.setRequestLogger(requestLogger);
         sylphClient.setResponseLogger(responseLogger);
         sylphClient.setResponseProcessor(responseProcessor);
+        sylphClient.setHttpClient(client);
         return sylphClient;
     }
 
-    void baseRequest(SylphHttpRequestBuilder baseRequest) {
-        this.baseRequest = baseRequest;
+    public SylphHttpClientBuilder authBase64(String username, String password) {
+        Objects.requireNonNull(username, "Cannot do basic authentification request with empty username");
+        Objects.requireNonNull(password, "Cannot do basic authentification request with empty password");
+        this.authenticator(new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password.toCharArray());
+            }
+        });
+        return this;
+    }
+
+    void baseRequestBuilder(SylphHttpRequestBuilder baseRequestBuilder) {
+        this.baseRequestBuilder = baseRequestBuilder;
     }
 
     void parser(Parser parser) {

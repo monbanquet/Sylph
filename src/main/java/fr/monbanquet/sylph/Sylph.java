@@ -36,12 +36,12 @@ import java.util.Objects;
 
 public class Sylph {
 
-    private SylphHttpRequestBuilder internalBaseRequest;
+    private SylphHttpRequestBuilder internalBaseRequestBuilder;
     private Parser internalParser;
     private RequestLogger internalRequestLogger;
     private ResponseLogger internalResponseLogger;
     private ResponseProcessor internalResponseProcessor;
-    private SylphHttpClientBuilder internalClient;
+    private SylphHttpClientBuilder internalClientBuilder;
 
     public static Sylph builder() {
         return new Sylph();
@@ -55,6 +55,11 @@ public class Sylph {
         return this.build();
     }
 
+    public Sylph setClient(SylphHttpClientBuilder clientBuilder) {
+        this.internalClientBuilder = clientBuilder;
+        return this;
+    }
+
     private SylphHttpClient build() {
 
         SylphHttpRequestBuilder baseRequest;
@@ -64,9 +69,9 @@ public class Sylph {
         ResponseProcessor responseProcessor;
         SylphHttpClientBuilder client;
 
-        baseRequest = (Objects.isNull(internalBaseRequest))
+        baseRequest = (Objects.isNull(internalBaseRequestBuilder))
                 ? SylphHttpRequestBuilder.newBuilder()
-                : internalBaseRequest;
+                : internalBaseRequestBuilder;
 
         parser = (Objects.isNull(internalParser))
                 ? DefaultParser.create()
@@ -84,10 +89,13 @@ public class Sylph {
                 ? DefaultResponseProcessor.create()
                 : internalResponseProcessor;
 
+        client = (Objects.isNull(internalClientBuilder))
+                ? new SylphHttpClientBuilder()
+                : internalClientBuilder;
+
         baseRequest.parser(parser);
 
-        client = new SylphHttpClientBuilder();
-        client.baseRequest(baseRequest);
+        client.baseRequestBuilder(baseRequest);
         client.parser(parser);
         client.requestLogger(requestLogger);
         client.responseLogger(responseLogger);
@@ -97,14 +105,9 @@ public class Sylph {
     }
 
     public Sylph setBaseRequest(SylphHttpRequestBuilder baseRequest) {
-        this.internalBaseRequest = baseRequest;
+        this.internalBaseRequestBuilder = baseRequest;
         return this;
 
-    }
-
-    public Sylph setClient(SylphHttpClientBuilder clientBuilder) {
-        this.internalClient = clientBuilder;
-        return this;
     }
 
     public Sylph setParser(Parser parser) {

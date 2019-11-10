@@ -255,7 +255,22 @@ public class SylphHttpClient extends HttpClientDelegate {
                 .setRequestLogger(requestLogger)
                 .setResponseLogger(responseLogger)
                 .setResponseProcessor(responseProcessor)
+                .setClient(internalCopy())
                 .getClient();
+    }
+
+    protected SylphHttpClientBuilder internalCopy() {
+        SylphHttpClientBuilder builder = SylphHttpClient.newBuilder();
+        cookieHandler().ifPresent(value -> builder.cookieHandler(value));
+        connectTimeout().ifPresent(value -> builder.connectTimeout(value));
+        builder.sslContext(sslContext());
+        builder.sslParameters(sslParameters());
+        executor().ifPresent(value -> builder.executor(value));
+        builder.followRedirects(followRedirects());
+        builder.version(version());
+        proxy().ifPresent(value -> builder.proxy(value));
+        authenticator().ifPresent(value -> builder.authenticator(value));
+        return builder;
     }
 
     // ---  --- //
@@ -266,10 +281,6 @@ public class SylphHttpClient extends HttpClientDelegate {
 
     public void setBaseRequestBuilder(SylphHttpRequestBuilder baseRequestBuilder) {
         this.baseRequestBuilder = baseRequestBuilder;
-    }
-
-    public void setHttpClient(HttpClient httpClient) {
-        this.httpClient = httpClient;
     }
 
     public void setParser(Parser parser) {
@@ -286,6 +297,10 @@ public class SylphHttpClient extends HttpClientDelegate {
 
     public void setResponseProcessor(ResponseProcessor responseProcessor) {
         this.responseProcessor = responseProcessor;
+    }
+
+    public void setHttpClient(HttpClient httpClient) {
+        this.httpClient = httpClient;
     }
 
 }
