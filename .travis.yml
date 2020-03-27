@@ -1,8 +1,10 @@
 language: java
 
 jdk:
-  - oraclejdk11
   - openjdk11
+  - openjdk12
+  - openjdk13
+  - openjdk14
 
 os:
   - linux
