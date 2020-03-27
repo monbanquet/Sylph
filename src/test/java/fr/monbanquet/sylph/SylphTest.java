@@ -56,7 +56,7 @@ public class SylphTest {
                 .GET()
                 .copy()
                 .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(5))
+                .timeout(Duration.ofSeconds(10))
                 .build();
         HttpClient client = HttpClient.newBuilder()
                 .priority(1)
@@ -84,7 +84,7 @@ public class SylphTest {
                         .GET()
                         .copy()
                         .version(HttpClient.Version.HTTP_2)
-                        .timeout(Duration.ofSeconds(5)))
+                        .timeout(Duration.ofSeconds(10)))
                 .setClient(SylphHttpClient.newBuilder()
                         .priority(1)
                         .version(HttpClient.Version.HTTP_2)

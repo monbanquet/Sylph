@@ -52,7 +52,7 @@ public class SylphHttpClientTestSendMethodsAsync {
                 .GET()
                 .copy()
                 .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(5))
+                .timeout(Duration.ofSeconds(10))
                 .build();
         SylphHttpClient client = SylphHttpClient.newHttpClient();
 
@@ -77,7 +77,7 @@ public class SylphHttpClientTestSendMethodsAsync {
                         .GET()
                         .copy()
                         .version(HttpClient.Version.HTTP_2)
-                        .timeout(Duration.ofSeconds(5)))
+                        .timeout(Duration.ofSeconds(10)))
                 .getClient();
 
         // when
@@ -100,7 +100,7 @@ public class SylphHttpClientTestSendMethodsAsync {
                 .GET()
                 .copy()
                 .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(5))
+                .timeout(Duration.ofSeconds(10))
                 .build();
         SylphHttpClient client = SylphHttpClient.newHttpClient();
 
