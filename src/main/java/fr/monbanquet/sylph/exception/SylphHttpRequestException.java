@@ -32,7 +32,7 @@ public class SylphHttpRequestException extends SylphException {
     private final String requestUri;
     private final String requestMethod;
 
-    public SylphHttpRequestException(String requestUri, String requestMethod, Exception e) {
+    public SylphHttpRequestException(String requestUri, String requestMethod, Throwable e) {
         super(e);
         this.requestUri = requestUri;
         this.requestMethod = requestMethod;

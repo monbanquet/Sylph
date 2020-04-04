@@ -36,10 +36,14 @@ public class AssertTodo {
     }
 
     public static void assertResult(Todo result) {
-        assertEquals(result.getId(), 1l);
-        assertEquals(result.getUserId(), 1l);
-        assertEquals(result.getTitle(), "delectus aut autem");
-        assertFalse(result.isCompleted());
+        assertResult(result, 44l);
+    }
+
+    public static void assertResult(Todo result, long id) {
+        assertEquals(result.getId(), id);
+        assertEquals(result.getUserId(), 5l);
+        assertEquals(result.getTitle(), "A title");
+        assertTrue(result.isCompleted());
     }
 
 }

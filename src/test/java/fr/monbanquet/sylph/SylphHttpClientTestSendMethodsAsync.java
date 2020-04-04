@@ -23,144 +23,76 @@
  */
 package fr.monbanquet.sylph;
 
-import fr.monbanquet.sylph.helpers.AssertTodo;
+import fr.monbanquet.sylph.exception.SylphHttpRequestException;
 import fr.monbanquet.sylph.helpers.Todo;
-import fr.monbanquet.sylph.parser.DefaultParser;
-import fr.monbanquet.sylph.parser.Parser;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockserver.integration.ClientAndServer;
+import org.mockserver.junit.jupiter.MockServerExtension;
+import org.mockserver.junit.jupiter.MockServerSettings;
 
-import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.CompletionException;
 
-public class SylphHttpClientTestSendMethodsAsync {
+@ExtendWith(MockServerExtension.class)
+@MockServerSettings(ports = {1080})
+public class SylphHttpClientTestSendMethodsAsync extends SylphHttpClientTestSendMethodsAbstract {
 
-    private static final String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
-    private static final String TODO_1_URL = TODOS_URL + "/1";
+    public SylphHttpClientTestSendMethodsAsync(ClientAndServer client) {
+        super(client);
+    }
 
-    private static final Parser parser = DefaultParser.create();
-
-    @Test
-    void send_with_request_param_and_responseBodyHandler_param() {
-        // given
-        HttpRequest request = HttpRequest.newBuilder()
-                .header("Content-Type", "application/json; charset=utf-8")
-                .uri(URI.create(TODO_1_URL))
-                .GET()
-                .copy()
-                .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(5))
-                .build();
-        SylphHttpClient client = SylphHttpClient.newHttpClient();
-
-        // when
-        HttpResponse<String> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .join();
-
-        // then
-        String body = response.body();
-        Todo todo = parser.deserialize(body, Todo.class);
-        AssertTodo.assertResult(todo);
+    @Override
+    protected SylphHttpResponse<String, String> call_send_with_request_param_and_responseBodyHandler(HttpRequest request, SylphHttpClient client) {
+        HttpResponse<String> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
+        return new SylphHttpResponseWithTransform<>(response, String.class, parser);
     }
 
 
-    @Test
-    void send_with_responseBodyHandler_param() {
-        // given
-        SylphHttpClient client = Sylph.builder()
-                .setBaseRequest(SylphHttpRequest.newBuilder()
-                        .header("Content-Type", "application/json; charset=utf-8")
-                        .uri(URI.create(TODO_1_URL))
-                        .GET()
-                        .copy()
-                        .version(HttpClient.Version.HTTP_2)
-                        .timeout(Duration.ofSeconds(5)))
-                .getClient();
-
-        // when
-        SylphHttpResponse<String, String> response = client.sendAsync(HttpResponse.BodyHandlers.ofString())
-                .join();
-
-        // then
-        String body = response.body();
-        Todo todo = parser.deserialize(body, Todo.class);
-        AssertTodo.assertResult(todo);
+    @Override
+    protected SylphHttpResponse<String, String> call_send_with_responseBodyHandler(SylphHttpClient client) {
+        return client.sendAsync(HttpResponse.BodyHandlers.ofString()).join();
     }
 
 
-    @Test
-    void send_with_request_param_and_returnType_param() {
-        // given
-        HttpRequest request = HttpRequest.newBuilder()
-                .header("Content-Type", "application/json; charset=utf-8")
-                .uri(URI.create(TODO_1_URL))
-                .GET()
-                .copy()
-                .version(HttpClient.Version.HTTP_2)
-                .timeout(Duration.ofSeconds(5))
-                .build();
-        SylphHttpClient client = SylphHttpClient.newHttpClient();
-
-        // when
-        SylphHttpResponse<String, Todo> response = client.sendAsync(request, Todo.class)
-                .join();
-
-        // then
-        Todo todo = response.asObject();
-        AssertTodo.assertResult(todo);
+    @Override
+    protected SylphHttpResponse<String, Todo> call_send_with_request_param_and_returnType_param(HttpRequest request, SylphHttpClient client) {
+        return client.sendAsync(request, Todo.class).join();
     }
 
-    @Test
-    void send_with_returnType_object_param() {
-        // when
-        Todo todo = Sylph.newClient()
-                .GET(TODO_1_URL)
-                .sendAsync(Todo.class)
-                .join()
-                .asObject();
-
-        // then
-        AssertTodo.assertResult(todo);
+    @Override
+    protected Todo call_send_with_returnType_object() {
+        return Sylph.newClient().GET(URL).sendAsync(Todo.class).join().asObject();
     }
 
-    @Test
-    void send_with_returnType_list_param() {
-        // when
-        Todo todo = Sylph.newClient()
-                .GET(TODO_1_URL)
-                .sendAsync(Todo.class)
-                .join()
-                .asObject();
-
-        // then
-        AssertTodo.assertResult(todo);
+    @Override
+    protected List<Todo> call_send_with_returnType_list() {
+        return Sylph.newClient().GET(URL).sendAsync(Todo.class).join().asList();
     }
 
-    @Test
-    void body_with_returnType_param() {
-        // when
-        Todo todo = Sylph.newClient()
-                .GET(TODO_1_URL)
-                .bodyAsync(Todo.class)
-                .join();
-
-        // then
-        AssertTodo.assertResult(todo);
+    @Override
+    protected Todo call_body_with_returnType() {
+        return Sylph.newClient().GET(URL).bodyAsync(Todo.class).join();
     }
 
-    @Test
-    void bodyList_with_returnType_param() {
-        // when
-        List<Todo> todos = Sylph.newClient()
-                .GET(TODOS_URL)
-                .bodyListAsync(Todo.class)
-                .join();
+    @Override
+    protected List<Todo> call_bodyList_with_returnType() {
+        return Sylph.newClient().GET(URL).bodyListAsync(Todo.class).join();
+    }
 
-        // then
-        AssertTodo.assertResult(todos);
+    @Override
+    protected void call_send_with_wrong_uri_scheme_should_throws_error() {
+        Sylph.newClient().GET("NOT_EXISTS").sendAsync().join();
+    }
+
+    @Override
+    protected void call_send_with_uri_not_exists_should_throws_error() {
+        try {
+            Sylph.newClient().GET("http://not.exists").sendAsync().join();
+        } catch (CompletionException e) {
+            throw new SylphHttpRequestException("", "", e);
+        }
     }
 
 }
