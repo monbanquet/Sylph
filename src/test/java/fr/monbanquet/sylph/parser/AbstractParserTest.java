@@ -23,7 +23,7 @@
  */
 package fr.monbanquet.sylph.parser;
 
-import fr.monbanquet.sylph.helpers.Helper;
+import fr.monbanquet.sylph.helpers.TodoBuilder;
 import fr.monbanquet.sylph.helpers.TodoExtended;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +48,7 @@ abstract class AbstractParserTest {
 
     AbstractParserTest() {
         todoList = IntStream.range(1, 1000)
-                .mapToObj(Helper::newTodoExtended)
+                .mapToObj(TodoBuilder::newTodoExtended)
                 .collect(Collectors.toList());
         todo = todoList.get(0);
 

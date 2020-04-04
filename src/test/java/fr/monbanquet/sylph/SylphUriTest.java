@@ -38,74 +38,74 @@ class SylphUriTest {
     void toUri_all_methods() {
         URI uri = SylphUri.newUri()
                 .scheme("https")
-                .host("jsonplaceholder.typicode.com")
+                .host("my.server.fake")
                 .port(443)
                 .path("/posts")
                 .queryParams("userId", 1)
                 .queryParams("postId", 2)
                 .toUri();
 
-        assertEquals(uri.toString(), "https://jsonplaceholder.typicode.com:443/posts?postId=2&userId=1");
+        assertEquals(uri.toString(), "https://my.server.fake:443/posts?postId=2&userId=1");
     }
 
     @Test
     void toUri_minimal() {
         URI uri = SylphUri.newUri()
-                .host("jsonplaceholder.typicode.com")
+                .host("my.server.fake")
                 .toUri();
 
-        assertEquals(uri.toString(), "http://jsonplaceholder.typicode.com");
+        assertEquals(uri.toString(), "http://my.server.fake");
     }
 
     @Test
     void toUri_with_scheme() {
         URI uri = SylphUri.newUri()
                 .https()
-                .host("jsonplaceholder.typicode.com")
+                .host("my.server.fake")
                 .toUri();
 
-        assertEquals(uri.toString(), "https://jsonplaceholder.typicode.com");
+        assertEquals(uri.toString(), "https://my.server.fake");
     }
 
     @Test
     void toUri_with_port() {
         URI uri = SylphUri.newUri()
-                .host("jsonplaceholder.typicode.com")
+                .host("my.server.fake")
                 .port(555)
                 .toUri();
 
-        assertEquals(uri.toString(), "http://jsonplaceholder.typicode.com:555");
+        assertEquals(uri.toString(), "http://my.server.fake:555");
     }
 
     @Test
     void toUri_with_query_params() {
         URI uri = SylphUri.newUri()
-                .host("jsonplaceholder.typicode.com")
+                .host("my.server.fake")
                 .queryParams("userId", 1)
                 .queryParams("postId", 2)
                 .toUri();
 
-        assertEquals(uri.toString(), "http://jsonplaceholder.typicode.com?postId=2&userId=1");
+        assertEquals(uri.toString(), "http://my.server.fake?postId=2&userId=1");
     }
 
     @Test
     void toUri_with_query_params_map() {
         URI uri = SylphUri.newUri()
-                .host("jsonplaceholder.typicode.com")
+                .host("my.server.fake")
                 .queryParams(Map.of("postId", 2, "userId", 1))
                 .toUri();
 
-        assertEquals(uri.toString(), "http://jsonplaceholder.typicode.com?postId=2&userId=1");
+        assertEquals(uri.toString(), "http://my.server.fake?postId=2&userId=1");
     }
 
     @Test
     void toUri_should_add_slash_to_path() {
         URI uri = SylphUri.newUri()
-                .host("jsonplaceholder.typicode.com")
+                .host("my.server.fake")
                 .path("posts")
                 .toUri();
 
-        assertEquals(uri.toString(), "http://jsonplaceholder.typicode.com/posts");
+        assertEquals(uri.toString(), "http://my.server.fake/posts");
     }
 
     @Test

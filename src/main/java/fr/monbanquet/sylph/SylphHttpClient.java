@@ -56,6 +56,8 @@ public class SylphHttpClient extends HttpClientDelegate {
         return new SylphHttpClientBuilder();
     }
 
+    // ---  --- //
+
     public SylphHttpClient GET(String uri) {
         return GET(URI.create(uri));
     }
@@ -208,14 +210,25 @@ public class SylphHttpClient extends HttpClientDelegate {
     }
 
     public CompletableFuture<SylphHttpResponse<Void, Void>> sendAsync() {
-        return doSendAsync(getRequest(), HttpResponse.BodyHandlers.discarding())
+        HttpRequest request = getRequest();
+        CompletableFuture<HttpResponse<Void>> httpResponseCompletableFuture = doSendAsync(request, HttpResponse.BodyHandlers.discarding());
+        if (httpResponseCompletableFuture.isCompletedExceptionally()) {
+             httpResponseCompletableFuture.join();
+        }
+        return httpResponseCompletableFuture
                 .thenApply(SylphHttpResponseSimple::new);
     }
 
 
     private <T> CompletableFuture<HttpResponse<T>> doSendAsync(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler) {
-        return CompletableFuture.supplyAsync(() -> requestLogger.log(request))
+        return CompletableFuture
+                .supplyAsync(() -> requestLogger.log(request))
                 .thenCompose(r -> httpClient.sendAsync(request, responseBodyHandler))
+                .exceptionally(throwable -> {
+                    String requestUri = request.uri().toString();
+                    String requestMethod = request.method();
+                    throw new SylphHttpRequestException(requestUri, requestMethod, throwable);
+                })
                 .thenApply(response -> responseLogger.log(response))
                 .thenApply(response -> responseProcessor.processResponse(response));
     }

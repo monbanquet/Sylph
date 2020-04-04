@@ -23,12 +23,20 @@
  */
 package fr.monbanquet.sylph;
 
-import fr.monbanquet.sylph.helpers.Helper;
+import fr.monbanquet.sylph.helpers.AssertTodo;
+import fr.monbanquet.sylph.helpers.ObjectToString;
 import fr.monbanquet.sylph.helpers.Todo;
+import fr.monbanquet.sylph.helpers.TodoBuilder;
 import fr.monbanquet.sylph.parser.DefaultParser;
 import fr.monbanquet.sylph.parser.Parser;
+import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockserver.integration.ClientAndServer;
+import org.mockserver.junit.jupiter.MockServerExtension;
+import org.mockserver.junit.jupiter.MockServerSettings;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -40,25 +48,49 @@ import java.util.stream.Collectors;
 import static fr.monbanquet.sylph.SylphHttpRequestBuilder.HEADER_CONTENT_TYPE;
 import static fr.monbanquet.sylph.SylphHttpRequestBuilder.HEADER_CONTENT_TYPE_VALUE;
 
+
+@ExtendWith(MockServerExtension.class)
+@MockServerSettings(ports = {1080})
 class SylphHttpRequestBuilderTest {
 
-    private static final String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
+    private static final String BASE_URL = "http://localhost:1080";
+    private static final String PATH_URL = "/the-path";
+    private static final String URL = BASE_URL + PATH_URL;
 
     private static final Parser parser = DefaultParser.create();
 
+    private final ClientAndServer client;
+
+    public SylphHttpRequestBuilderTest(ClientAndServer client) {
+        this.client = client;
+    }
+
+    @BeforeEach
+    public void init() {
+        client.reset();
+    }
+
     @Test
     void post_should_throws_exception_when_no_parser() {
-        Assertions.assertThrows(NullPointerException.class, () ->
-                SylphHttpRequest.newBuilder(TODOS_URL)
-                        .POST(Helper.newTodo())
+        // when
+        AbstractThrowableAssert<?, ? extends Throwable> catchError = org.assertj.core.api.Assertions.assertThatThrownBy(() ->
+                SylphHttpRequest.newBuilder(URL)
+                        .POST(TodoBuilder.newTodo())
                         .build());
+
+        // then
+        catchError.isInstanceOf(NullPointerException.class);
     }
 
     @Test
     void post_with_todo_object() {
         // given
-        Todo todo = Helper.newTodo();
-        SylphHttpRequest request = SylphHttpRequest.newBuilder(TODOS_URL)
+        Todo todo = TodoBuilder.newTodo();
+        client.when(org.mockserver.model.HttpRequest.request()
+                .withPath(PATH_URL))
+                .respond(org.mockserver.model.HttpResponse.response()
+                        .withBody(ObjectToString.toString(todo)));
+        SylphHttpRequest request = SylphHttpRequest.newBuilder(URL)
                 .parser(DefaultParser.create())
                 .POST(todo)
                 .build();
@@ -69,15 +101,19 @@ class SylphHttpRequestBuilderTest {
                 .asObject();
 
         // then
-        Assertions.assertNotEquals(todoResult.getId(), todo.getId());
+        AssertTodo.assertResult(todoResult);
     }
 
     @Test
     void post_with_todo_json_string() {
         // given
-        Todo todo = Helper.newTodo();
+        Todo todo = TodoBuilder.newTodo();
         String todoJsonString = parser.serialize(todo);
-        SylphHttpRequest request = SylphHttpRequest.newBuilder(TODOS_URL)
+        client.when(org.mockserver.model.HttpRequest.request()
+                .withPath(PATH_URL))
+                .respond(org.mockserver.model.HttpResponse.response()
+                        .withBody(ObjectToString.toString(todo)));
+        SylphHttpRequest request = SylphHttpRequest.newBuilder(URL)
                 .POST(todoJsonString)
                 .build();
 
@@ -87,14 +123,18 @@ class SylphHttpRequestBuilderTest {
                 .asObject();
 
         // then
-        Assertions.assertNotEquals(todoResult.getId(), todo.getId());
+        AssertTodo.assertResult(todoResult);
     }
 
     @Test
     void put_with_todo_object() {
         // given
-        Todo todo = Helper.newTodo();
-        SylphHttpRequest request = SylphHttpRequest.newBuilder(TODOS_URL + "/" + todo.getId())
+        Todo todo = TodoBuilder.newTodo();
+        client.when(org.mockserver.model.HttpRequest.request()
+                .withPath(PATH_URL))
+                .respond(org.mockserver.model.HttpResponse.response()
+                        .withBody(ObjectToString.toString(todo)));
+        SylphHttpRequest request = SylphHttpRequest.newBuilder(URL)
                 .parser(DefaultParser.create())
                 .PUT(todo)
                 .build();
@@ -105,15 +145,19 @@ class SylphHttpRequestBuilderTest {
                 .asObject();
 
         // then
-        Assertions.assertEquals(todoResult.getId(), todo.getId());
+        AssertTodo.assertResult(todoResult);
     }
 
     @Test
     void put_with_todo_json_string() {
         // given
-        Todo todo = Helper.newTodo();
+        Todo todo = TodoBuilder.newTodo();
         String todoJsonString = parser.serialize(todo);
-        SylphHttpRequest request = SylphHttpRequest.newBuilder(TODOS_URL + "/" + todo.getId())
+        client.when(org.mockserver.model.HttpRequest.request()
+                .withPath(PATH_URL))
+                .respond(org.mockserver.model.HttpResponse.response()
+                        .withBody(ObjectToString.toString(todo)));
+        SylphHttpRequest request = SylphHttpRequest.newBuilder(URL)
                 .PUT(todoJsonString)
                 .build();
 
@@ -123,7 +167,7 @@ class SylphHttpRequestBuilderTest {
                 .asObject();
 
         // then
-        Assertions.assertEquals(todoResult.getId(), todo.getId());
+        org.assertj.core.api.Assertions.assertThat(todoResult.getId()).isEqualTo(todo.getId());
     }
 
     @Test

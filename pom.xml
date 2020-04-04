@@ -60,6 +60,7 @@
 
         <jackson.version>2.10.3</jackson.version>
         <junit.version>5.6.1</junit.version>
+        <mockserver.version>5.10.0</mockserver.version>
     </properties>
 
     <dependencies>
@@ -124,6 +125,26 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.mock-server</groupId>
+            <artifactId>mockserver-netty</artifactId>
+            <version>${mockserver.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mock-server</groupId>
+            <artifactId>mockserver-client-java</artifactId>
+            <version>${mockserver.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mock-server</groupId>
+            <artifactId>mockserver-junit-jupiter</artifactId>
+            <version>${mockserver.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+
     </dependencies>
 
     <build>
@@ -140,6 +161,14 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M4</version>
+                <configuration>
+                    <properties>
+                        <property>
+                            <name>listener</name>
+                            <value>org.mockserver.maven.StopMockServerTestListener</value>
+                        </property>
+                    </properties>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -156,6 +185,31 @@
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.mock-server</groupId>
+                <artifactId>mockserver-maven-plugin</artifactId>
+                <version>${mockserver.version}</version>
+                <configuration>
+                    <serverPort>1080</serverPort>
+                    <logLevel>DEBUG</logLevel>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>process-test-classes</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>runForked</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>verify</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>stopForked</goal>
                         </goals>
                     </execution>
                 </executions>
