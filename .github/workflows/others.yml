@@ -1,0 +1,32 @@
+name: Java 12, 13 and 14
+
+on: [pull_request]
+
+jobs:
+
+  test_java:
+    name: Java ${{ matrix.java }}
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [12, 13, 14]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+
+      - name: Cache Maven packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Build with Maven
+        run: mvn -B clean verify
