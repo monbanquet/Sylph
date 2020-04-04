@@ -25,7 +25,9 @@ package fr.monbanquet.sylph.logger;
 
 import java.net.http.HttpRequest;
 
+@FunctionalInterface
 public interface RequestLogger {
 
     HttpRequest log(HttpRequest request);
+
 }
