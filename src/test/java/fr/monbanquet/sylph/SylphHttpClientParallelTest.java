@@ -1,8 +1,15 @@
 package fr.monbanquet.sylph;
 
+import fr.monbanquet.sylph.helpers.ObjectToString;
 import fr.monbanquet.sylph.helpers.Todo;
+import fr.monbanquet.sylph.helpers.TodoBuilder;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockserver.integration.ClientAndServer;
+import org.mockserver.junit.jupiter.MockServerExtension;
+import org.mockserver.junit.jupiter.MockServerSettings;
+import org.mockserver.model.HttpStatusCode;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -15,9 +22,32 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ExtendWith(MockServerExtension.class)
+@MockServerSettings(ports = {1080})
 public class SylphHttpClientParallelTest {
 
-    private static final String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
+    private static final String BASE_URL = "http://localhost:1080";
+    private static final String PATH_URL = "/the-path";
+    private static final String URL = BASE_URL + PATH_URL;
+
+    private final ClientAndServer client;
+
+    public SylphHttpClientParallelTest(ClientAndServer client) {
+        this.client = client;
+
+        // init server response
+        IntStream.rangeClosed(1, 100)
+                .parallel()
+                .forEach(i -> {
+                    Todo todo = TodoBuilder.newTodo();
+                    todo.setId(i);
+                    client.when(org.mockserver.model.HttpRequest.request()
+                            .withPath(PATH_URL + "/" + i))
+                            .respond(org.mockserver.model.HttpResponse.response()
+                                    .withStatusCode(HttpStatusCode.OK_200.code())
+                                    .withBody(ObjectToString.toString(todo)));
+                });
+    }
 
     private void parallel(IntConsumer func) {
         IntStream.rangeClosed(1, 100)
@@ -39,7 +69,7 @@ public class SylphHttpClientParallelTest {
         HttpClient httpClient = HttpClient.newBuilder().build();
         parallel(i -> {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(TODOS_URL + "/" + i))
+                    .uri(URI.create(URL + "/" + i))
                     .GET()
                     .build();
             Assertions.assertThatCode(() -> {
@@ -54,7 +84,7 @@ public class SylphHttpClientParallelTest {
         HttpClient httpClient = HttpClient.newBuilder().build();
         parallel(i -> {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(TODOS_URL + "/" + i))
+                    .uri(URI.create(URL + "/" + i))
                     .GET()
                     .build();
             HttpResponse<String> response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
@@ -68,7 +98,7 @@ public class SylphHttpClientParallelTest {
     void parallel_stream_sync_request_when_new_client_inside_loop() {
         parallel(i -> {
             Todo todo = Sylph.newClient()
-                    .GET(TODOS_URL + "/" + i)
+                    .GET(URL + "/" + i)
                     .send(Todo.class)
                     .asObject();
             assertEquals(todo.getId(), i);
@@ -80,7 +110,7 @@ public class SylphHttpClientParallelTest {
         Sylph sylph = Sylph.builder();
         parallel(i -> {
             Todo todo = sylph.getClient()
-                    .GET(TODOS_URL + "/" + i)
+                    .GET(URL + "/" + i)
                     .send(Todo.class)
                     .asObject();
             assertEquals(todo.getId(), i);
@@ -92,7 +122,7 @@ public class SylphHttpClientParallelTest {
         SylphHttpClient sylphHttpClient = Sylph.newClient();
         parallel(i -> {
             Todo todo = sylphHttpClient
-                    .GET(TODOS_URL + "/" + i)
+                    .GET(URL + "/" + i)
                     .send(Todo.class)
                     .asObject();
             assertEquals(todo.getId(), i);
@@ -104,7 +134,7 @@ public class SylphHttpClientParallelTest {
     @Test
     void parallel_stream_async_request_when_new_client_inside_loop() {
         parallelAsync(i -> Sylph.newClient()
-                .GET(TODOS_URL + "/" + i)
+                .GET(URL + "/" + i)
                 .sendAsync(Todo.class)
                 .thenAccept(response -> {
                     Todo todo = response.asObject();
@@ -116,7 +146,7 @@ public class SylphHttpClientParallelTest {
     void parallel_stream_async_request_when_new_sylph_builder_outside_and_new_client_inside_loop() {
         Sylph sylph = Sylph.builder();
         parallelAsync(i -> sylph.getClient()
-                .GET(TODOS_URL + "/" + i)
+                .GET(URL + "/" + i)
                 .sendAsync(Todo.class)
                 .thenAccept(response -> {
                     Todo todo = response.asObject();
@@ -128,7 +158,7 @@ public class SylphHttpClientParallelTest {
     void parallel_stream_async_request_when_new_client_outside_loop() {
         SylphHttpClient sylphHttpClient = Sylph.newClient();
         parallelAsync(i -> sylphHttpClient
-                .GET(TODOS_URL + "/" + i)
+                .GET(URL + "/" + i)
                 .sendAsync(Todo.class)
                 .thenAccept(response -> {
                     Todo todo = response.asObject();

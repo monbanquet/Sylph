@@ -82,7 +82,7 @@ public class SylphHttpClientTestCopy {
 
         SylphHttpClient client = clientBuilder.build();
 
-                // when
+        // when
         SylphHttpClient copy = client.copy();
 
         // then

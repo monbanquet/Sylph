@@ -24,14 +24,17 @@
 package fr.monbanquet.sylph;
 
 import fr.monbanquet.sylph.helpers.AssertTodo;
+import fr.monbanquet.sylph.helpers.ObjectToString;
 import fr.monbanquet.sylph.helpers.Todo;
-import fr.monbanquet.sylph.logger.DefaultRequestLogger;
-import fr.monbanquet.sylph.logger.DefaultResponseLogger;
-import fr.monbanquet.sylph.logger.SylphLogger;
+import fr.monbanquet.sylph.helpers.TodoBuilder;
 import fr.monbanquet.sylph.parser.DefaultParser;
 import fr.monbanquet.sylph.parser.Parser;
-import fr.monbanquet.sylph.processor.DefaultResponseProcessor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockserver.integration.ClientAndServer;
+import org.mockserver.junit.jupiter.MockServerExtension;
+import org.mockserver.junit.jupiter.MockServerSettings;
 
 import java.io.IOException;
 import java.net.URI;
@@ -40,19 +43,38 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
+@ExtendWith(MockServerExtension.class)
+@MockServerSettings(ports = {1080})
 public class SylphTest {
 
-    private static final String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
-    private static final String TODO_1_URL = TODOS_URL + "/1";
+    protected static final String BASE_URL = "http://localhost:1080";
+    protected static final String PATH_URL = "/the-path";
+    protected static final String URL = BASE_URL + PATH_URL;
 
-    private static final Parser parser = DefaultParser.create();
+    protected static final Parser parser = DefaultParser.create();
+
+    private final ClientAndServer client;
+
+    public SylphTest(ClientAndServer client) {
+        this.client = client;
+    }
+
+    @BeforeEach
+    public void init() {
+        Todo todo = TodoBuilder.newTodo();
+        client.when(org.mockserver.model.HttpRequest.request()
+                .withPath(PATH_URL))
+                .respond(org.mockserver.model.HttpResponse.response()
+                        .withBody(ObjectToString.toString(todo)));
+    }
 
     @Test
-    void standard_java_http_client() throws IOException, InterruptedException {
-        // given
+    void builder_like_standard_client() throws IOException, InterruptedException {
+        /** given **/
+        // standard client
         HttpRequest request = HttpRequest.newBuilder()
                 .header("Content-Type", "application/json; charset=utf-8")
-                .uri(URI.create(TODO_1_URL))
+                .uri(URI.create(URL))
                 .GET()
                 .copy()
                 .version(HttpClient.Version.HTTP_2)
@@ -63,24 +85,11 @@ public class SylphTest {
                 .version(HttpClient.Version.HTTP_2)
                 .followRedirects(HttpClient.Redirect.ALWAYS)
                 .build();
-
-        // when
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        // then
-        String body = response.body();
-        Todo todo = parser.deserialize(body, Todo.class);
-        AssertTodo.assertResult(todo);
-    }
-
-
-    @Test
-    void all_methods_builder() {
-        // given
-        SylphHttpClient http = Sylph.builder()
+        // sylph client
+        SylphHttpClient sylph = Sylph.builder()
                 .setBaseRequest(SylphHttpRequest.newBuilder()
                         .header("Content-Type", "application/json; charset=utf-8")
-                        .uri(URI.create(TODO_1_URL))
+                        .uri(URI.create(URL))
                         .GET()
                         .copy()
                         .version(HttpClient.Version.HTTP_2)
@@ -90,17 +99,21 @@ public class SylphTest {
                         .version(HttpClient.Version.HTTP_2)
                         .followRedirects(HttpClient.Redirect.ALWAYS)
                 )
-                .setParser(DefaultParser.create())
-                .setRequestLogger(DefaultRequestLogger.create(SylphLogger.INFO))
-                .setResponseLogger(DefaultResponseLogger.create())
-                .setResponseProcessor(new DefaultResponseProcessor())
                 .getClient();
 
-        // when
-        Todo responseBody = http.send(Todo.class).asObject();
+        /** when **/
+        // standard client
+        HttpResponse<String> responseStandard = client.send(request, HttpResponse.BodyHandlers.ofString());
+        // sylph client
+        SylphHttpResponse<String, Todo> responseSylph = sylph.send(Todo.class);
 
-        // then
-        AssertTodo.assertResult(responseBody);
+        /** then **/
+        // standard client
+        String body = responseStandard.body();
+        Todo todo = parser.deserialize(body, Todo.class);
+        AssertTodo.assertResult(todo);
+        // sylph client
+        AssertTodo.assertResult(responseSylph.asObject());
     }
 
 }

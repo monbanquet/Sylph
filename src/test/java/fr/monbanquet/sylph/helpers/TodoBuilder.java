@@ -31,11 +31,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Helper {
+public class TodoBuilder {
 
     public static Todo newTodo() {
+        return newTodo(44);
+    }
+
+    public static Todo newTodo(int id) {
         Todo todo = new Todo();
-        todo.setId(44);
+        todo.setId(id);
         todo.setUserId(5);
         todo.setTitle("A title");
         todo.setCompleted(true);

@@ -31,6 +31,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 
 public class SylphHttpRequestBuilder extends HttpRequestBuilderDelegate {
@@ -85,6 +86,14 @@ public class SylphHttpRequestBuilder extends HttpRequestBuilderDelegate {
     public <T> SylphHttpRequestBuilder PUT(T body) {
         Objects.requireNonNull(parser, "Request require a Parser");
         return PUT(HttpRequest.BodyPublishers.ofString(parser.serialize(body)));
+    }
+
+    public SylphHttpRequestBuilder authBase64(String username, String password) {
+        Objects.requireNonNull(username, "Cannot do basic authentication request with empty username");
+        Objects.requireNonNull(password, "Cannot do basic authentication request with empty password");
+        String encoding = Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+        header("Authorization", "Basic " + encoding);
+        return this;
     }
 
     // ---  --- //

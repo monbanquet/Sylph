@@ -62,14 +62,14 @@ public class Sylph {
 
     private SylphHttpClient build() {
 
-        SylphHttpRequestBuilder baseRequest;
+        SylphHttpRequestBuilder baseRequestBuilder;
         Parser parser;
         RequestLogger requestLogger;
         ResponseLogger responseLogger;
         ResponseProcessor responseProcessor;
         SylphHttpClientBuilder client;
 
-        baseRequest = (Objects.isNull(internalBaseRequestBuilder))
+        baseRequestBuilder = (Objects.isNull(internalBaseRequestBuilder))
                 ? SylphHttpRequestBuilder.newBuilder()
                 : internalBaseRequestBuilder;
 
@@ -93,9 +93,9 @@ public class Sylph {
                 ? new SylphHttpClientBuilder()
                 : internalClientBuilder;
 
-        baseRequest.parser(parser);
+        baseRequestBuilder.parser(parser);
 
-        client.baseRequestBuilder(baseRequest);
+        client.baseRequestBuilder(baseRequestBuilder);
         client.parser(parser);
         client.requestLogger(requestLogger);
         client.responseLogger(responseLogger);

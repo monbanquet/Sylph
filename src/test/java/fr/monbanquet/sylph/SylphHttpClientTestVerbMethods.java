@@ -23,192 +23,352 @@
  */
 package fr.monbanquet.sylph;
 
+import fr.monbanquet.sylph.exception.SylphHttpResponseException;
 import fr.monbanquet.sylph.helpers.AssertTodo;
-import fr.monbanquet.sylph.helpers.Helper;
+import fr.monbanquet.sylph.helpers.ObjectToString;
 import fr.monbanquet.sylph.helpers.Todo;
-import org.junit.jupiter.api.Assertions;
+import fr.monbanquet.sylph.helpers.TodoBuilder;
+import io.netty.handler.codec.http.HttpMethod;
+import org.assertj.core.api.AbstractThrowableAssert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockserver.integration.ClientAndServer;
+import org.mockserver.junit.jupiter.MockServerExtension;
+import org.mockserver.junit.jupiter.MockServerSettings;
+import org.mockserver.model.HttpRequest;
+import org.mockserver.model.HttpResponse;
+import org.mockserver.model.HttpStatusCode;
 
 import java.net.URI;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+@ExtendWith(MockServerExtension.class)
+@MockServerSettings(ports = {1080})
 class SylphHttpClientTestVerbMethods {
 
-    private static final String TODOS_URL = "http://jsonplaceholder.typicode.com/todos";
-    private static final String TODO_1_URL = TODOS_URL + "/1";
+    private static final String BASE_URL = "http://localhost:1080";
+    private static final String PATH_URL = "/the-path";
+    private static final String URL = BASE_URL + PATH_URL;
+
+    private final ClientAndServer client;
+
+    public SylphHttpClientTestVerbMethods(ClientAndServer client) {
+        this.client = client;
+    }
+
+    @BeforeEach
+    public void init() {
+        client.reset();
+    }
 
     @Test
     void get_with_url_string_param() {
+        // given
+        client.when(HttpRequest.request()
+                .withMethod(HttpMethod.GET.name())
+                .withPath(PATH_URL))
+                .respond(HttpResponse.response()
+                        .withStatusCode(HttpStatusCode.OK_200.code())
+                        .withBody(ObjectToString.toString(TodoBuilder.newTodo())));
+
         // when
-        Todo todo = Sylph.newClient()
-                .GET(TODO_1_URL)
+        Todo todoResult = Sylph.newClient()
+                .GET(URL)
                 .send(Todo.class)
                 .asObject();
 
         // then
-        AssertTodo.assertResult(todo);
+        AssertTodo.assertResult(todoResult);
     }
 
     @Test
     void get_with_uri_param() {
+        // given
+        client.when(HttpRequest.request()
+                .withMethod(HttpMethod.GET.name())
+                .withPath(PATH_URL))
+                .respond(HttpResponse.response()
+                        .withStatusCode(HttpStatusCode.OK_200.code())
+                        .withBody(ObjectToString.toString(TodoBuilder.newTodo())));
+
         // when
-        Todo todo = Sylph.newClient()
-                .GET(URI.create(TODO_1_URL))
+        Todo todoResult = Sylph.newClient()
+                .GET(URI.create(URL))
                 .send(Todo.class)
                 .asObject();
 
         // then
-        AssertTodo.assertResult(todo);
+        AssertTodo.assertResult(todoResult);
     }
 
     @Test
     void post_with_url_string_param() {
+        // given
+        client.when(HttpRequest.request()
+                .withMethod(HttpMethod.POST.name())
+                .withPath(PATH_URL))
+                .respond(HttpResponse.response()
+                        .withStatusCode(HttpStatusCode.OK_200.code())
+                        .withBody(ObjectToString.toString(TodoBuilder.newTodo())));
+
         // when
         Todo todoResult = Sylph.newClient()
-                .POST(TODOS_URL)
+                .POST(URL)
                 .send(Todo.class)
                 .asObject();
 
         // then
-        Assertions.assertNotEquals(todoResult.getId(), 0);
-        Assertions.assertEquals(todoResult.getUserId(), 0);
-        Assertions.assertNull(todoResult.getTitle());
-        Assertions.assertFalse(todoResult.isCompleted());
+        AssertTodo.assertResult(todoResult);
     }
 
     @Test
     void post_with_uri_param() {
+        // given
+        client.when(HttpRequest.request()
+                .withMethod(HttpMethod.POST.name())
+                .withPath(PATH_URL))
+                .respond(HttpResponse.response()
+                        .withStatusCode(HttpStatusCode.OK_200.code())
+                        .withBody(ObjectToString.toString(TodoBuilder.newTodo())));
+
         // when
         Todo todoResult = newClient()
-                .POST(URI.create(TODOS_URL))
+                .POST(URI.create(URL))
                 .send(Todo.class)
                 .asObject();
 
         // then
-        Assertions.assertNotEquals(todoResult.getId(), 0);
-        Assertions.assertEquals(todoResult.getUserId(), 0);
-        Assertions.assertNull(todoResult.getTitle());
-        Assertions.assertFalse(todoResult.isCompleted());
+        AssertTodo.assertResult(todoResult);
     }
 
     @Test
     void post_with_url_string_param_and_body_object_param() {
         // given
-        Todo todo = Helper.newTodo();
+        int id = 41;
+        Todo todo = TodoBuilder.newTodo();
+        todo.setId(id);
+        String todoString = ObjectToString.toString(todo);
+        client.when(HttpRequest.request()
+                .withMethod(HttpMethod.POST.name())
+                .withPath(PATH_URL))
+                .respond(httpRequest -> {
+                    if (httpRequest.getBodyAsString().equals(todoString)) {
+                        return HttpResponse.response()
+                                .withStatusCode(HttpStatusCode.OK_200.code())
+                                .withBody(todoString);
+                    } else {
+                        return HttpResponse.response()
+                                .withStatusCode(HttpStatusCode.BAD_REQUEST_400.code());
+                    }
+                });
 
         // when
         Todo todoResult = newClient()
-                .POST(TODOS_URL, todo)
+                .POST(URL, todo)
                 .send(Todo.class)
                 .asObject();
 
         // then
-        Assertions.assertNotEquals(todoResult.getId(), todo.getId());
+        AssertTodo.assertResult(todoResult, id);
     }
 
     @Test
     void post_with_uri_param_and_body_object_param() {
         // given
-        Todo todo = Helper.newTodo();
+        int id = 41;
+        Todo todo = TodoBuilder.newTodo();
+        todo.setId(id);
+        String todoString = ObjectToString.toString(todo);
+        client.when(HttpRequest.request()
+                .withMethod(HttpMethod.POST.name())
+                .withPath(PATH_URL))
+                .respond(httpRequest -> {
+                    if (httpRequest.getBodyAsString().equals(todoString)) {
+                        return HttpResponse.response()
+                                .withStatusCode(HttpStatusCode.OK_200.code())
+                                .withBody(todoString);
+                    } else {
+                        return HttpResponse.response()
+                                .withStatusCode(HttpStatusCode.BAD_REQUEST_400.code());
+                    }
+                });
 
         // when
         Todo todoResult = newClient()
-                .POST(URI.create(TODOS_URL), todo)
+                .POST(URI.create(URL), todo)
                 .send(Todo.class)
                 .asObject();
 
         // then
-        Assertions.assertNotEquals(todoResult.getId(), todo.getId());
+        AssertTodo.assertResult(todoResult, id);
+    }
+
+    @Test
+    void post_with_body_object_param_throw_error() {
+        // given
+        int codeError = HttpStatusCode.INTERNAL_SERVER_ERROR_500.code();
+        String bodyError = "INTERNAL ERROR";
+        client.when(HttpRequest.request()
+                .withMethod(HttpMethod.POST.name())
+                .withPath(PATH_URL))
+                .respond(HttpResponse.response()
+                        .withStatusCode(codeError)
+                        .withBody(bodyError));
+
+        // when
+        AbstractThrowableAssert<?, ? extends Throwable> catchError = assertThatThrownBy(() ->
+                newClient()
+                        .POST(URI.create(URL), TodoBuilder.newTodo())
+                        .send(Todo.class)
+                        .asObject());
+
+        // then
+        catchError.isInstanceOf(SylphHttpResponseException.class)
+                .hasMessageContainingAll(String.valueOf(codeError), bodyError)
+                .hasFieldOrPropertyWithValue("responseCode", codeError)
+                .hasFieldOrPropertyWithValue("errorBody", bodyError);
     }
 
     @Test
     void put_with_url_string_param() {
         // given
         int id = 42;
+        Todo todo = TodoBuilder.newTodo();
+        todo.setId(id);
+        client.when(HttpRequest.request()
+                .withMethod(HttpMethod.PUT.name())
+                .withPath(PATH_URL + "/" + id))
+                .respond(httpRequest -> HttpResponse.response()
+                        .withStatusCode(HttpStatusCode.OK_200.code())
+                        .withBody(ObjectToString.toString(todo)));
 
         // when
         Todo todoResult = newClient()
-                .PUT(TODOS_URL + "/" + id)
+                .PUT(URL + "/" + id)
                 .send(Todo.class)
                 .asObject();
 
         // then
-        Assertions.assertEquals(todoResult.getId(), id);
+        AssertTodo.assertResult(todoResult, id);
     }
 
     @Test
     void put_with_uri_param() {
         // given
         int id = 42;
+        Todo todo = TodoBuilder.newTodo();
+        todo.setId(id);
+        client.when(HttpRequest.request()
+                .withMethod(HttpMethod.PUT.name())
+                .withPath(PATH_URL + "/" + id))
+                .respond(httpRequest -> HttpResponse.response()
+                        .withStatusCode(HttpStatusCode.OK_200.code())
+                        .withBody(ObjectToString.toString(todo)));
 
         // when
         Todo todoResult = newClient()
-                .PUT(TODOS_URL + "/" + id)
+                .PUT(URL + "/" + id)
                 .send(Todo.class)
                 .asObject();
 
         // then
-        Assertions.assertEquals(todoResult.getId(), id);
+        AssertTodo.assertResult(todoResult, id);
     }
 
     @Test
     void put_with_url_string_param_and_body_object_param() {
         // given
         int id = 42;
-        Todo todo = Helper.newTodo();
+        Todo todo = TodoBuilder.newTodo();
+        todo.setId(id);
+        client.when(HttpRequest.request()
+                .withMethod(HttpMethod.PUT.name())
+                .withPath(PATH_URL + "/" + id))
+                .respond(httpRequest -> HttpResponse.response()
+                        .withStatusCode(HttpStatusCode.OK_200.code())
+                        .withBody(ObjectToString.toString(todo)));
 
         // when
         Todo todoResult = newClient()
-                .PUT(TODOS_URL + "/" + id, todo)
+                .PUT(URL + "/" + id)
                 .send(Todo.class)
                 .asObject();
 
         // then
-        Assertions.assertEquals(todoResult.getId(), id);
+        AssertTodo.assertResult(todoResult, id);
     }
 
     @Test
     void put_with_uri_param_and_body_object_param() {
         // given
         int id = 42;
-        Todo todo = Helper.newTodo();
+        Todo todo = TodoBuilder.newTodo();
+        todo.setId(id);
+        client.when(HttpRequest.request()
+                .withMethod(HttpMethod.PUT.name())
+                .withPath(PATH_URL + "/" + id))
+                .respond(httpRequest -> HttpResponse.response()
+                        .withStatusCode(HttpStatusCode.OK_200.code())
+                        .withBody(ObjectToString.toString(todo)));
 
         // when
         Todo todoResult = newClient()
-                .PUT(URI.create(TODOS_URL + "/" + id), todo)
+                .PUT(URI.create(URL + "/" + id), todo)
                 .send(Todo.class)
                 .asObject();
 
         // then
-        Assertions.assertEquals(todoResult.getId(), id);
+        AssertTodo.assertResult(todoResult, id);
     }
 
     @Test
     void delete_with_string_param() {
+        // given
+        int id = 44;
+        Todo todo = new Todo();
+        client.when(HttpRequest.request()
+                .withMethod(HttpMethod.DELETE.name())
+                .withPath(PATH_URL + "/" + id))
+                .respond(httpRequest -> HttpResponse.response()
+                        .withStatusCode(HttpStatusCode.OK_200.code())
+                        .withBody(ObjectToString.toString(todo)));
+
         // when
         Todo todoResult = newClient()
-                .DELETE(TODOS_URL + "/44")
+                .DELETE(URL + "/44")
                 .body(Todo.class);
 
         // then
-        Assertions.assertEquals(todoResult.getId(), 0);
+        org.junit.jupiter.api.Assertions.assertEquals(todoResult.getId(), 0);
     }
 
     @Test
     void delete_with_uri_param() {
+        // given
+        int id = 44;
+        Todo todo = new Todo();
+        client.when(HttpRequest.request()
+                .withMethod(HttpMethod.DELETE.name())
+                .withPath(PATH_URL + "/" + id))
+                .respond(httpRequest -> HttpResponse.response()
+                        .withStatusCode(HttpStatusCode.OK_200.code())
+                        .withBody(ObjectToString.toString(todo)));
+
         // when
         Todo todoResult = newClient()
-                .DELETE(URI.create(TODOS_URL + "/44"))
+                .DELETE(URI.create(URL + "/44"))
                 .send(Todo.class)
                 .asObject();
 
         // then
-        Assertions.assertEquals(todoResult.getId(), 0);
+        org.junit.jupiter.api.Assertions.assertEquals(todoResult.getId(), 0);
     }
 
     private SylphHttpClient newClient() {
         return Sylph.builder()
                 .getClient();
     }
-
 
 }

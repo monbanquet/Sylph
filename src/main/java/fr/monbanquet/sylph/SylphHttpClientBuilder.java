@@ -33,7 +33,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
 import java.net.Authenticator;
 import java.net.CookieHandler;
-import java.net.PasswordAuthentication;
 import java.net.ProxySelector;
 import java.net.http.HttpClient;
 import java.time.Duration;
@@ -68,18 +67,6 @@ public class SylphHttpClientBuilder extends HttpClientBuilderDelegate {
         sylphClient.setResponseProcessor(responseProcessor);
         sylphClient.setHttpClient(client);
         return sylphClient;
-    }
-
-    public SylphHttpClientBuilder authBase64(String username, String password) {
-        Objects.requireNonNull(username, "Cannot do basic authentification request with empty username");
-        Objects.requireNonNull(password, "Cannot do basic authentification request with empty password");
-        this.authenticator(new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password.toCharArray());
-            }
-        });
-        return this;
     }
 
     void baseRequestBuilder(SylphHttpRequestBuilder baseRequestBuilder) {
