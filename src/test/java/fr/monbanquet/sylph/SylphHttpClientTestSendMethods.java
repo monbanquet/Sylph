@@ -58,32 +58,32 @@ public class SylphHttpClientTestSendMethods extends SylphHttpClientTestSendMetho
 
     @Override
     protected Todo call_send_with_returnType_object() {
-        return Sylph.newClient().GET(URL).send(Todo.class).asObject();
+        return Sylph.GET(URL).send(Todo.class).asObject();
     }
 
     @Override
     protected List<Todo> call_send_with_returnType_list() {
-        return Sylph.newClient().GET(URL).send(Todo.class).asList();
+        return Sylph.GET(URL).send(Todo.class).asList();
     }
 
     @Override
     protected Todo call_body_with_returnType() {
-        return Sylph.newClient().GET(URL).body(Todo.class);
+        return Sylph.GET(URL).body(Todo.class);
     }
 
     @Override
     protected List<Todo> call_bodyList_with_returnType() {
-        return Sylph.newClient().GET(URL).bodyList(Todo.class);
+        return Sylph.GET(URL).bodyList(Todo.class);
     }
 
     @Override
     protected void call_send_with_wrong_uri_scheme_should_throws_error() {
-        Sylph.newClient().GET("NOT_EXISTS").send();
+        Sylph.GET("NOT_EXISTS").send();
     }
 
     @Override
     protected void call_send_with_uri_not_exists_should_throws_error() {
-        Sylph.newClient().GET("http://not.exists").send();
+        Sylph.GET("http://not.exists").send();
     }
 
 }

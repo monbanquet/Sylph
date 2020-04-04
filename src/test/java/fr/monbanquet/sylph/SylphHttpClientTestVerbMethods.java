@@ -74,7 +74,7 @@ class SylphHttpClientTestVerbMethods {
                         .withBody(ObjectToString.toString(TodoBuilder.newTodo())));
 
         // when
-        Todo todoResult = Sylph.newClient()
+        Todo todoResult = Sylph
                 .GET(URL)
                 .send(Todo.class)
                 .asObject();
@@ -94,7 +94,7 @@ class SylphHttpClientTestVerbMethods {
                         .withBody(ObjectToString.toString(TodoBuilder.newTodo())));
 
         // when
-        Todo todoResult = Sylph.newClient()
+        Todo todoResult = Sylph
                 .GET(URI.create(URL))
                 .send(Todo.class)
                 .asObject();
@@ -114,7 +114,7 @@ class SylphHttpClientTestVerbMethods {
                         .withBody(ObjectToString.toString(TodoBuilder.newTodo())));
 
         // when
-        Todo todoResult = Sylph.newClient()
+        Todo todoResult = Sylph
                 .POST(URL)
                 .send(Todo.class)
                 .asObject();
@@ -134,7 +134,7 @@ class SylphHttpClientTestVerbMethods {
                         .withBody(ObjectToString.toString(TodoBuilder.newTodo())));
 
         // when
-        Todo todoResult = newClient()
+        Todo todoResult = Sylph
                 .POST(URI.create(URL))
                 .send(Todo.class)
                 .asObject();
@@ -165,7 +165,7 @@ class SylphHttpClientTestVerbMethods {
                 });
 
         // when
-        Todo todoResult = newClient()
+        Todo todoResult = Sylph
                 .POST(URL, todo)
                 .send(Todo.class)
                 .asObject();
@@ -196,7 +196,7 @@ class SylphHttpClientTestVerbMethods {
                 });
 
         // when
-        Todo todoResult = newClient()
+        Todo todoResult = Sylph
                 .POST(URI.create(URL), todo)
                 .send(Todo.class)
                 .asObject();
@@ -219,7 +219,7 @@ class SylphHttpClientTestVerbMethods {
 
         // when
         AbstractThrowableAssert<?, ? extends Throwable> catchError = assertThatThrownBy(() ->
-                newClient()
+                Sylph
                         .POST(URI.create(URL), TodoBuilder.newTodo())
                         .send(Todo.class)
                         .asObject());
@@ -245,7 +245,7 @@ class SylphHttpClientTestVerbMethods {
                         .withBody(ObjectToString.toString(todo)));
 
         // when
-        Todo todoResult = newClient()
+        Todo todoResult = Sylph
                 .PUT(URL + "/" + id)
                 .send(Todo.class)
                 .asObject();
@@ -268,7 +268,7 @@ class SylphHttpClientTestVerbMethods {
                         .withBody(ObjectToString.toString(todo)));
 
         // when
-        Todo todoResult = newClient()
+        Todo todoResult = Sylph
                 .PUT(URL + "/" + id)
                 .send(Todo.class)
                 .asObject();
@@ -291,7 +291,7 @@ class SylphHttpClientTestVerbMethods {
                         .withBody(ObjectToString.toString(todo)));
 
         // when
-        Todo todoResult = newClient()
+        Todo todoResult = Sylph
                 .PUT(URL + "/" + id)
                 .send(Todo.class)
                 .asObject();
@@ -314,7 +314,7 @@ class SylphHttpClientTestVerbMethods {
                         .withBody(ObjectToString.toString(todo)));
 
         // when
-        Todo todoResult = newClient()
+        Todo todoResult = Sylph
                 .PUT(URI.create(URL + "/" + id), todo)
                 .send(Todo.class)
                 .asObject();
@@ -336,7 +336,7 @@ class SylphHttpClientTestVerbMethods {
                         .withBody(ObjectToString.toString(todo)));
 
         // when
-        Todo todoResult = newClient()
+        Todo todoResult = Sylph
                 .DELETE(URL + "/44")
                 .body(Todo.class);
 
@@ -357,18 +357,13 @@ class SylphHttpClientTestVerbMethods {
                         .withBody(ObjectToString.toString(todo)));
 
         // when
-        Todo todoResult = newClient()
+        Todo todoResult = Sylph
                 .DELETE(URI.create(URL + "/44"))
                 .send(Todo.class)
                 .asObject();
 
         // then
         org.junit.jupiter.api.Assertions.assertEquals(todoResult.getId(), 0);
-    }
-
-    private SylphHttpClient newClient() {
-        return Sylph.builder()
-                .getClient();
     }
 
 }

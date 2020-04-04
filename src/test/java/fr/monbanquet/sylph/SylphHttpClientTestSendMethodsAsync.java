@@ -63,33 +63,33 @@ public class SylphHttpClientTestSendMethodsAsync extends SylphHttpClientTestSend
 
     @Override
     protected Todo call_send_with_returnType_object() {
-        return Sylph.newClient().GET(URL).sendAsync(Todo.class).join().asObject();
+        return Sylph.GET(URL).sendAsync(Todo.class).join().asObject();
     }
 
     @Override
     protected List<Todo> call_send_with_returnType_list() {
-        return Sylph.newClient().GET(URL).sendAsync(Todo.class).join().asList();
+        return Sylph.GET(URL).sendAsync(Todo.class).join().asList();
     }
 
     @Override
     protected Todo call_body_with_returnType() {
-        return Sylph.newClient().GET(URL).bodyAsync(Todo.class).join();
+        return Sylph.GET(URL).bodyAsync(Todo.class).join();
     }
 
     @Override
     protected List<Todo> call_bodyList_with_returnType() {
-        return Sylph.newClient().GET(URL).bodyListAsync(Todo.class).join();
+        return Sylph.GET(URL).bodyListAsync(Todo.class).join();
     }
 
     @Override
     protected void call_send_with_wrong_uri_scheme_should_throws_error() {
-        Sylph.newClient().GET("NOT_EXISTS").sendAsync().join();
+        Sylph.GET("NOT_EXISTS").sendAsync().join();
     }
 
     @Override
     protected void call_send_with_uri_not_exists_should_throws_error() {
         try {
-            Sylph.newClient().GET("http://not.exists").sendAsync().join();
+            Sylph.GET("http://not.exists").sendAsync().join();
         } catch (CompletionException e) {
             throw new SylphHttpRequestException("", "", e);
         }
