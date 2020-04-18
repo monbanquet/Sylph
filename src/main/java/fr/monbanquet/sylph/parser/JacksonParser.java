@@ -70,7 +70,7 @@ public class JacksonParser implements Parser {
     @Override
     public <T> List<T> deserializeList(String input, Class<T> returnType) {
         try {
-            if (isEmpty(input)) return null;
+            if (isEmpty(input)) return List.of();
             JavaType valueType = TypeFactory.defaultInstance().constructParametricType(
                     List.class,
                     returnType);
