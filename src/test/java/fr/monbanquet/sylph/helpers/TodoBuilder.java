@@ -33,47 +33,6 @@ import java.util.stream.IntStream;
 
 public class TodoBuilder {
 
-    public static Todo newTodo() {
-        return newTodo(44);
-    }
-
-    public static Todo newTodo(int id) {
-        Todo todo = new Todo();
-        todo.setId(id);
-        todo.setUserId(5);
-        todo.setTitle("A title");
-        todo.setCompleted(true);
-        return todo;
-    }
-
-    public static TodoExtended newTodoExtended() {
-        return newTodoExtended(44);
-    }
-
-    public static TodoExtended newTodoExtended(int id) {
-        TodoExtended todo = new TodoExtended();
-        todo.setId(id);
-        todo.setUserId(5);
-        todo.setTitle(longText);
-        todo.setCompleted(true);
-        todo.setA(71d);
-        todo.setB(longText);
-        todo.setC(444444444444l);
-        todo.setD(List.of("a", "b", "c", "dd", "eee", "ffff", "ggggg"));
-        todo.setE(Map.of(
-                "a", newTodo(),
-                "bb", newTodo(),
-                "ccc", newTodo(),
-                "dddd", newTodo(),
-                "eeeee", newTodo()
-        ));
-        todo.setF(IntStream.range(1, 10).mapToObj(i -> newTodo()).collect(Collectors.toList()));
-        todo.setG(LocalDateTime.now());
-        todo.setH(LocalDate.now());
-        todo.setI(LocalTime.now());
-        return todo;
-    }
-
     static String longText =
             "\n" +
                     "\n" +
@@ -176,5 +135,46 @@ public class TodoBuilder {
                     "Fusce nec odio et mi venenatis rutrum ac non lacus. Mauris vel pulvinar lacus. Duis dignissim lacus libero, ac consectetur ligula sollicitudin non. In eu dolor eget elit auctor dictum. Phasellus nec dolor ipsum. Quisque nunc ipsum, auctor eu massa id, iaculis viverra neque. Curabitur maximus nulla quis urna hendrerit, id commodo odio finibus.\n" +
                     "\n" +
                     "Suspendisse sed laoreet nulla. Vivamus ultricies volutpat lacus, in iaculis orci suscipit a. Pellentesque nec scelerisque felis. Integer venenatis sem in pulvinar vulputate. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspendisse at ligula tempor, semper felis ut, venenatis lectus. Vivamus convallis dictum risus tristique fermentum. Pellentesque vitae turpis urna. Phasellus a euismod ipsum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce quis nunc nec risus pharetra hendrerit. Sed accumsan lacus ac velit condimentum, vitae blandit ante lacinia. Aliquam nec lobortis erat. ";
+
+    public static Todo newTodo() {
+        return newTodo(44);
+    }
+
+    public static Todo newTodo(int id) {
+        Todo todo = new Todo();
+        todo.setId(id);
+        todo.setUserId(5);
+        todo.setTitle("A title");
+        todo.setCompleted(true);
+        return todo;
+    }
+
+    public static TodoExtended newTodoExtended() {
+        return newTodoExtended(44);
+    }
+
+    public static TodoExtended newTodoExtended(int id) {
+        TodoExtended todo = new TodoExtended();
+        todo.setId(id);
+        todo.setUserId(5);
+        todo.setTitle(longText);
+        todo.setCompleted(true);
+        todo.setA(71d);
+        todo.setB(longText);
+        todo.setC(444444444444l);
+        todo.setD(List.of("a", "b", "c", "dd", "eee", "ffff", "ggggg"));
+        todo.setE(Map.of(
+                "a", newTodo(),
+                "bb", newTodo(),
+                "ccc", newTodo(),
+                "dddd", newTodo(),
+                "eeeee", newTodo()
+        ));
+        todo.setF(IntStream.range(1, 10).mapToObj(i -> newTodo()).collect(Collectors.toList()));
+        todo.setG(LocalDateTime.now());
+        todo.setH(LocalDate.now());
+        todo.setI(LocalTime.now());
+        return todo;
+    }
 
 }

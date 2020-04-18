@@ -32,7 +32,7 @@ import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.concurrent.Executor;
 
-public class HttpClientBuilderDelegate implements HttpClient.Builder  {
+public class HttpClientBuilderDelegate implements HttpClient.Builder {
 
     protected HttpClient.Builder builder = HttpClient.newBuilder();
 

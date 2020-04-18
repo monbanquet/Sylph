@@ -20,8 +20,6 @@ import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @ExtendWith(MockServerExtension.class)
 @MockServerSettings(ports = {1080})
 public class SylphHttpClientParallelTest {
@@ -101,7 +99,7 @@ public class SylphHttpClientParallelTest {
                     .GET(URL + "/" + i)
                     .send(Todo.class)
                     .asObject();
-            assertEquals(todo.getId(), i);
+            Assertions.assertThat(todo.getId()).isEqualTo(i);
         });
     }
 
@@ -113,7 +111,7 @@ public class SylphHttpClientParallelTest {
                     .GET(URL + "/" + i)
                     .send(Todo.class)
                     .asObject();
-            assertEquals(todo.getId(), i);
+            Assertions.assertThat(todo.getId()).isEqualTo(i);
         });
     }
 
@@ -125,7 +123,7 @@ public class SylphHttpClientParallelTest {
                     .GET(URL + "/" + i)
                     .send(Todo.class)
                     .asObject();
-            assertEquals(todo.getId(), i);
+            Assertions.assertThat(todo.getId()).isEqualTo(i);
         });
     }
 
@@ -138,7 +136,7 @@ public class SylphHttpClientParallelTest {
                 .sendAsync(Todo.class)
                 .thenAccept(response -> {
                     Todo todo = response.asObject();
-                    assertEquals(todo.getId(), i);
+                    Assertions.assertThat(todo.getId()).isEqualTo(i);
                 }));
     }
 
@@ -150,7 +148,7 @@ public class SylphHttpClientParallelTest {
                 .sendAsync(Todo.class)
                 .thenAccept(response -> {
                     Todo todo = response.asObject();
-                    assertEquals(todo.getId(), i);
+                    Assertions.assertThat(todo.getId()).isEqualTo(i);
                 }));
     }
 
@@ -162,7 +160,7 @@ public class SylphHttpClientParallelTest {
                 .sendAsync(Todo.class)
                 .thenAccept(response -> {
                     Todo todo = response.asObject();
-                    assertEquals(todo.getId(), i);
+                    Assertions.assertThat(todo.getId()).isEqualTo(i);
                 }));
     }
 

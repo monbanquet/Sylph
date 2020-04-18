@@ -24,13 +24,13 @@
 package fr.monbanquet.sylph;
 
 import fr.monbanquet.sylph.exception.SylphException;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class SylphUriTest {
 
@@ -45,7 +45,7 @@ class SylphUriTest {
                 .queryParams("postId", 2)
                 .toUri();
 
-        assertEquals(uri.toString(), "https://my.server.fake:443/posts?postId=2&userId=1");
+        assertThat(uri.toString()).isEqualTo("https://my.server.fake:443/posts?postId=2&userId=1");
     }
 
     @Test
@@ -54,7 +54,7 @@ class SylphUriTest {
                 .host("my.server.fake")
                 .toUri();
 
-        assertEquals(uri.toString(), "http://my.server.fake");
+        assertThat(uri.toString()).isEqualTo("http://my.server.fake");
     }
 
     @Test
@@ -64,7 +64,7 @@ class SylphUriTest {
                 .host("my.server.fake")
                 .toUri();
 
-        assertEquals(uri.toString(), "https://my.server.fake");
+        assertThat(uri.toString()).isEqualTo("https://my.server.fake");
     }
 
     @Test
@@ -74,7 +74,7 @@ class SylphUriTest {
                 .port(555)
                 .toUri();
 
-        assertEquals(uri.toString(), "http://my.server.fake:555");
+        assertThat(uri.toString()).isEqualTo("http://my.server.fake:555");
     }
 
     @Test
@@ -85,7 +85,7 @@ class SylphUriTest {
                 .queryParams("postId", 2)
                 .toUri();
 
-        assertEquals(uri.toString(), "http://my.server.fake?postId=2&userId=1");
+        assertThat(uri.toString()).isEqualTo("http://my.server.fake?postId=2&userId=1");
     }
 
     @Test
@@ -95,7 +95,7 @@ class SylphUriTest {
                 .queryParams(Map.of("postId", 2, "userId", 1))
                 .toUri();
 
-        assertEquals(uri.toString(), "http://my.server.fake?postId=2&userId=1");
+        assertThat(uri.toString()).isEqualTo("http://my.server.fake?postId=2&userId=1");
     }
 
     @Test
@@ -105,12 +105,14 @@ class SylphUriTest {
                 .path("posts")
                 .toUri();
 
-        assertEquals(uri.toString(), "http://my.server.fake/posts");
+        assertThat(uri.toString()).isEqualTo("http://my.server.fake/posts");
     }
 
     @Test
     void toUri_should_throw_exception_when_no_host() {
-        assertThrows(SylphException.class, () -> SylphUri.newUri().toUri());
+        Assertions
+                .assertThatThrownBy(() -> SylphUri.newUri().toUri())
+                .isInstanceOf(SylphException.class);
     }
 
 }

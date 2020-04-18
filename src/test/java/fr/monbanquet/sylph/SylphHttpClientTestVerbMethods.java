@@ -42,6 +42,7 @@ import org.mockserver.model.HttpStatusCode;
 
 import java.net.URI;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockServerExtension.class)
@@ -341,7 +342,7 @@ class SylphHttpClientTestVerbMethods {
                 .body(Todo.class);
 
         // then
-        org.junit.jupiter.api.Assertions.assertEquals(todoResult.getId(), 0);
+        assertThat(todoResult.getId()).isEqualTo(0);
     }
 
     @Test
@@ -363,7 +364,7 @@ class SylphHttpClientTestVerbMethods {
                 .asObject();
 
         // then
-        org.junit.jupiter.api.Assertions.assertEquals(todoResult.getId(), 0);
+        assertThat(todoResult.getId()).isEqualTo(0);
     }
 
 }

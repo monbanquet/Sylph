@@ -213,7 +213,7 @@ public class SylphHttpClient extends HttpClientDelegate {
         HttpRequest request = getRequest();
         CompletableFuture<HttpResponse<Void>> httpResponseCompletableFuture = doSendAsync(request, HttpResponse.BodyHandlers.discarding());
         if (httpResponseCompletableFuture.isCompletedExceptionally()) {
-             httpResponseCompletableFuture.join();
+            httpResponseCompletableFuture.join();
         }
         return httpResponseCompletableFuture
                 .thenApply(SylphHttpResponseSimple::new);

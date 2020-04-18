@@ -30,7 +30,6 @@ import fr.monbanquet.sylph.helpers.TodoBuilder;
 import fr.monbanquet.sylph.parser.DefaultParser;
 import fr.monbanquet.sylph.parser.Parser;
 import org.assertj.core.api.AbstractThrowableAssert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,6 +46,8 @@ import java.util.stream.Collectors;
 
 import static fr.monbanquet.sylph.SylphHttpRequestBuilder.HEADER_CONTENT_TYPE;
 import static fr.monbanquet.sylph.SylphHttpRequestBuilder.HEADER_CONTENT_TYPE_VALUE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 @ExtendWith(MockServerExtension.class)
@@ -73,7 +74,7 @@ class SylphHttpRequestBuilderTest {
     @Test
     void post_should_throws_exception_when_no_parser() {
         // when
-        AbstractThrowableAssert<?, ? extends Throwable> catchError = org.assertj.core.api.Assertions.assertThatThrownBy(() ->
+        AbstractThrowableAssert<?, ? extends Throwable> catchError = assertThatThrownBy(() ->
                 SylphHttpRequest.newBuilder(URL)
                         .POST(TodoBuilder.newTodo())
                         .build());
@@ -167,14 +168,14 @@ class SylphHttpRequestBuilderTest {
                 .asObject();
 
         // then
-        org.assertj.core.api.Assertions.assertThat(todoResult.getId()).isEqualTo(todo.getId());
+        assertThat(todoResult.getId()).isEqualTo(todo.getId());
     }
 
     @Test
     void request_should_have_default_content_type_if_not_set() {
         SylphHttpRequest request = SylphHttpRequest.newBuilder("https://fake.com").build();
-        Assertions.assertEquals(1, request.headers().allValues(HEADER_CONTENT_TYPE).size());
-        Assertions.assertEquals(HEADER_CONTENT_TYPE_VALUE, request.headers().firstValue(HEADER_CONTENT_TYPE).get());
+        assertThat(1).isEqualTo(request.headers().allValues(HEADER_CONTENT_TYPE).size());
+        assertThat(HEADER_CONTENT_TYPE_VALUE).isEqualTo(request.headers().firstValue(HEADER_CONTENT_TYPE).get());
     }
 
     @Test
@@ -183,8 +184,8 @@ class SylphHttpRequestBuilderTest {
         SylphHttpRequest request = SylphHttpRequest.newBuilder("https://fake.com")
                 .header(HEADER_CONTENT_TYPE, contentTypeValue)
                 .build();
-        Assertions.assertEquals(1, request.headers().allValues(HEADER_CONTENT_TYPE).size());
-        Assertions.assertEquals(contentTypeValue, request.headers().firstValue(HEADER_CONTENT_TYPE).get());
+        assertThat(1).isEqualTo(request.headers().allValues(HEADER_CONTENT_TYPE).size());
+        assertThat(contentTypeValue).isEqualTo(request.headers().firstValue(HEADER_CONTENT_TYPE).get());
     }
 
     @Test
@@ -194,16 +195,16 @@ class SylphHttpRequestBuilderTest {
         SylphHttpRequest request = SylphHttpRequest.newBuilder("https://fake.com")
                 .header(headerKey, headerValue)
                 .build();
-        Assertions.assertEquals(1, request.headers().allValues(HEADER_CONTENT_TYPE).size());
-        Assertions.assertEquals(HEADER_CONTENT_TYPE_VALUE, request.headers().firstValue(HEADER_CONTENT_TYPE).get());
-        Assertions.assertEquals(1, request.headers().allValues(headerKey).size());
-        Assertions.assertEquals(headerValue, request.headers().firstValue(headerKey).get());
+        assertThat(1).isEqualTo(request.headers().allValues(HEADER_CONTENT_TYPE).size());
+        assertThat(HEADER_CONTENT_TYPE_VALUE).isEqualTo(request.headers().firstValue(HEADER_CONTENT_TYPE).get());
+        assertThat(1).isEqualTo(request.headers().allValues(headerKey).size());
+        assertThat(headerValue).isEqualTo(request.headers().firstValue(headerKey).get());
     }
 
     @Test
     void request_should_have_default_timeout_if_not_set() {
         SylphHttpRequest request = SylphHttpRequest.newBuilder("https://fake.com").build();
-        Assertions.assertEquals(Duration.ofSeconds(30), request.timeout().get());
+        assertThat(Duration.ofSeconds(30)).isEqualTo(request.timeout().get());
     }
 
     @Test
@@ -211,7 +212,7 @@ class SylphHttpRequestBuilderTest {
         SylphHttpRequest request = SylphHttpRequest.newBuilder("https://fake.com")
                 .timeout(Duration.ofHours(24))
                 .build();
-        Assertions.assertEquals(Duration.ofHours(24), request.timeout().get());
+        assertThat(Duration.ofHours(24)).isEqualTo(request.timeout().get());
     }
 
 
@@ -243,34 +244,34 @@ class SylphHttpRequestBuilderTest {
                 .build();
 
         // then
-        Assertions.assertEquals(uri, copy.uri().toString());
+        assertThat(uri).isEqualTo(copy.uri().toString());
 
         Map<String, List<String>> headersMap = copy.headers().map();
         List<String> keys = headersMap.keySet().stream().collect(Collectors.toList());
 
-        Assertions.assertEquals(3, keys.size());
+        assertThat(3).isEqualTo(keys.size());
 
         // always contains Content-Type header
-        Assertions.assertEquals(HEADER_CONTENT_TYPE, keys.get(0));
-        Assertions.assertEquals(1, headersMap.get(HEADER_CONTENT_TYPE).size());
-        Assertions.assertEquals(HEADER_CONTENT_TYPE_VALUE, headersMap.get(HEADER_CONTENT_TYPE).get(0));
+        assertThat(HEADER_CONTENT_TYPE).isEqualTo(keys.get(0));
+        assertThat(1).isEqualTo(headersMap.get(HEADER_CONTENT_TYPE).size());
+        assertThat(HEADER_CONTENT_TYPE_VALUE).isEqualTo(headersMap.get(HEADER_CONTENT_TYPE).get(0));
 
-        Assertions.assertEquals(headerKey1, keys.get(1));
-        Assertions.assertEquals(1, headersMap.get(headerKey1).size());
-        Assertions.assertEquals(headerValue1, headersMap.get(headerKey1).get(0));
+        assertThat(headerKey1).isEqualTo(keys.get(1));
+        assertThat(1).isEqualTo(headersMap.get(headerKey1).size());
+        assertThat(headerValue1).isEqualTo(headersMap.get(headerKey1).get(0));
 
-        Assertions.assertEquals(headerKey2, keys.get(2));
-        Assertions.assertEquals(1, headersMap.get(headerKey2).size());
-        Assertions.assertEquals(headerValue2, headersMap.get(headerKey2).get(0));
+        assertThat(headerKey2).isEqualTo(keys.get(2));
+        assertThat(1).isEqualTo(headersMap.get(headerKey2).size());
+        assertThat(headerValue2).isEqualTo(headersMap.get(headerKey2).get(0));
 
-        Assertions.assertEquals(method, copy.method());
+        assertThat(method).isEqualTo(copy.method());
 
-        Assertions.assertEquals(bodyPublisher, copy.bodyPublisher().get());
+        assertThat(bodyPublisher).isEqualTo(copy.bodyPublisher().get());
 
-        Assertions.assertEquals(expectContinue, copy.expectContinue());
+        assertThat(expectContinue).isEqualTo(copy.expectContinue());
 
-        Assertions.assertEquals(timeout, copy.timeout().get());
+        assertThat(timeout).isEqualTo(copy.timeout().get());
 
-        Assertions.assertEquals(version, copy.version().get());
+        assertThat(version).isEqualTo(copy.version().get());
     }
 }

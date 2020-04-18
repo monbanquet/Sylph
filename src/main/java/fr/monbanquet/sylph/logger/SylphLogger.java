@@ -12,13 +12,8 @@ public enum SylphLogger {
     WARN(l -> l::warn, Logger::isWarnEnabled),
     ERROR(l -> l::error, Logger::isErrorEnabled);
 
-    interface LogMethod {
-        void log(String format, Object... arguments);
-    }
-
     private final Function<Logger, LogMethod> logMethod;
     private final Function<Logger, Boolean> isEnabledMethod;
-
     SylphLogger(Function<Logger, LogMethod> logMethod, Function<Logger, Boolean> isEnabledMethod) {
         this.logMethod = logMethod;
         this.isEnabledMethod = isEnabledMethod;
@@ -30,5 +25,9 @@ public enum SylphLogger {
 
     public boolean isEnabled(Logger logger) {
         return isEnabledMethod.apply(logger);
+    }
+
+    interface LogMethod {
+        void log(String format, Object... arguments);
     }
 }

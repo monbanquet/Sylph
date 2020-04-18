@@ -25,13 +25,13 @@ package fr.monbanquet.sylph.helpers;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AssertTodo {
 
     public static void assertResult(List<Todo> results) {
-        assertNotNull(results);
-        assertTrue(!results.isEmpty());
+        assertThat(results).isNotNull();
+        assertThat(!results.isEmpty()).isTrue();
         assertResult(results.get(0));
     }
 
@@ -40,10 +40,10 @@ public class AssertTodo {
     }
 
     public static void assertResult(Todo result, long id) {
-        assertEquals(result.getId(), id);
-        assertEquals(result.getUserId(), 5l);
-        assertEquals(result.getTitle(), "A title");
-        assertTrue(result.isCompleted());
+        assertThat(result.getId()).isEqualTo(id);
+        assertThat(result.getUserId()).isEqualTo(5l);
+        assertThat(result.getTitle()).isEqualTo("A title");
+        assertThat(result.isCompleted()).isTrue();
     }
 
 }

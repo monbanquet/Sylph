@@ -52,6 +52,52 @@ public class Sylph {
         return new Sylph().getClient();
     }
 
+    public static SylphHttpClient GET(String uri) {
+        return newClient().GET(uri);
+    }
+
+    public static SylphHttpClient GET(URI uri) {
+        return newClient().GET(uri);
+    }
+
+    public static SylphHttpClient POST(String uri) {
+        return newClient().POST(uri);
+    }
+
+    public static SylphHttpClient POST(URI uri) {
+        return newClient().POST(uri);
+    }
+
+    public static <T> SylphHttpClient POST(String uri, T body) {
+        return newClient().POST(uri, body);
+    }
+
+    public static <T> SylphHttpClient POST(URI uri, T body) {
+        return newClient().POST(uri, body);
+    }
+
+    public static <T> SylphHttpClient PUT(String uri) {
+        return newClient().PUT(uri);
+    }
+
+    public static <T> SylphHttpClient PUT(URI uri) {
+        return newClient().PUT(uri);
+    }
+
+    // ---  --- //
+
+    public static <T> SylphHttpClient PUT(URI uri, T body) {
+        return newClient().PUT(uri, body);
+    }
+
+    public static SylphHttpClient DELETE(String uri) {
+        return newClient().DELETE(uri);
+    }
+
+    public static SylphHttpClient DELETE(URI uri) {
+        return newClient().DELETE(uri);
+    }
+
     public SylphHttpClient getClient() {
         return this.build();
     }
@@ -129,62 +175,6 @@ public class Sylph {
     public Sylph setResponseProcessor(ResponseProcessor responseProcessor) {
         this.internalResponseProcessor = responseProcessor;
         return this;
-    }
-
-    // ---  --- //
-
-
-    public static SylphHttpClient GET(String uri) {
-        return newClient().GET(uri);
-    }
-
-
-    public static  SylphHttpClient GET(URI uri) {
-        return newClient().GET(uri);
-    }
-
-
-    public static  SylphHttpClient POST(String uri) {
-        return newClient().POST(uri);
-    }
-
-
-    public static SylphHttpClient POST(URI uri) {
-        return newClient().POST(uri);
-    }
-
-
-    public static <T> SylphHttpClient POST(String uri, T body) {
-        return newClient().POST(uri, body);
-    }
-
-
-    public static  <T> SylphHttpClient POST(URI uri, T body) {
-        return newClient().POST(uri, body);
-    }
-
-
-    public static  <T> SylphHttpClient PUT(String uri) {
-        return newClient().PUT(uri);
-    }
-
-
-    public static  <T> SylphHttpClient PUT(URI uri) {
-        return newClient().PUT(uri);
-    }
-
-
-    public static  <T> SylphHttpClient PUT(URI uri, T body) {
-        return newClient().PUT(uri, body);
-    }
-
-    public static  SylphHttpClient DELETE(String uri) {
-        return newClient().DELETE(uri);
-    }
-
-
-    public static SylphHttpClient DELETE(URI uri) {
-        return newClient().DELETE(uri);
     }
 
 
