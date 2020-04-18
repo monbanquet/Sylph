@@ -178,10 +178,8 @@ public class SylphHttpClient extends HttpClientDelegate {
         HttpResponse<T> response;
         try {
             response = httpClient.send(request, responseBodyHandler);
-        } catch (Exception e) {
-            String requestUri = request.uri().toString();
-            String requestMethod = request.method();
-            throw new SylphHttpRequestException(requestUri, requestMethod, e);
+        } catch (Throwable e) {
+            return createException(request, e);
         }
         responseLogger.log(response);
         responseProcessor.processResponse(response);
@@ -225,9 +223,7 @@ public class SylphHttpClient extends HttpClientDelegate {
                 .runAsync(() -> requestLogger.log(request))
                 .thenCompose(r -> httpClient.sendAsync(request, responseBodyHandler))
                 .exceptionally(throwable -> {
-                    String requestUri = request.uri().toString();
-                    String requestMethod = request.method();
-                    throw new SylphHttpRequestException(requestUri, requestMethod, throwable);
+                    return createException(request, throwable);
                 })
                 .thenApply(response -> {
                     responseLogger.log(response);
@@ -237,6 +233,12 @@ public class SylphHttpClient extends HttpClientDelegate {
                     responseProcessor.processResponse(response);
                     return response;
                 });
+    }
+
+    private <T> HttpResponse<T> createException(HttpRequest request, Throwable e) {
+        String requestUri = request.uri().toString();
+        String requestMethod = request.method();
+        throw new SylphHttpRequestException(requestUri, requestMethod, e);
     }
 
     // ---  --- //
