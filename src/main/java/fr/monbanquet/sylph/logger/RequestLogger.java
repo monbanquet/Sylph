@@ -28,6 +28,6 @@ import java.net.http.HttpRequest;
 @FunctionalInterface
 public interface RequestLogger {
 
-    HttpRequest log(HttpRequest request);
+    void log(HttpRequest request);
 
 }

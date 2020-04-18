@@ -27,8 +27,9 @@ import fr.monbanquet.sylph.exception.SylphHttpResponseException;
 
 import java.net.http.HttpResponse;
 
+@FunctionalInterface
 public interface ResponseProcessor {
 
-    <T> HttpResponse<T> processResponse(HttpResponse<T> response) throws SylphHttpResponseException;
+    <T> void processResponse(HttpResponse<T> response) throws SylphHttpResponseException;
 
 }

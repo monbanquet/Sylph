@@ -222,15 +222,21 @@ public class SylphHttpClient extends HttpClientDelegate {
 
     private <T> CompletableFuture<HttpResponse<T>> doSendAsync(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler) {
         return CompletableFuture
-                .supplyAsync(() -> requestLogger.log(request))
+                .runAsync(() -> requestLogger.log(request))
                 .thenCompose(r -> httpClient.sendAsync(request, responseBodyHandler))
                 .exceptionally(throwable -> {
                     String requestUri = request.uri().toString();
                     String requestMethod = request.method();
                     throw new SylphHttpRequestException(requestUri, requestMethod, throwable);
                 })
-                .thenApply(response -> responseLogger.log(response))
-                .thenApply(response -> responseProcessor.processResponse(response));
+                .thenApply(response -> {
+                    responseLogger.log(response);
+                    return response;
+                })
+                .thenApply(response -> {
+                    responseProcessor.processResponse(response);
+                    return response;
+                });
     }
 
     // ---  --- //

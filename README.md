@@ -195,13 +195,13 @@ You can change log logic by set your own logger.
 SylphHttpClient http = Sylph.builder()
         .setRequestLogger(new RequestLogger() {
             @Override
-            public HttpRequest log(HttpRequest request) {
+            public void log(HttpRequest request) {
                 // To complete
             }
         })
         .setResponseLogger(new ResponseLogger() {
             @Override
-            public <T> HttpResponse<T> log(HttpResponse<T> response) {
+            public <T> void log(HttpResponse<T> response) {
                 // To complete
             }
         })
@@ -227,7 +227,7 @@ You can also override this behavior.
 SylphHttpClient http = Sylph.builder()
         .setResponseProcessor(new ResponseProcessor() {
             @Override
-            public <T> HttpResponse<T> processResponse(HttpResponse<T> response) throws SylphHttpResponseException {
+            public <T> void processResponse(HttpResponse<T> response) throws SylphHttpResponseException {
                 // To complete
             }
         })

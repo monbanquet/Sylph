@@ -30,8 +30,7 @@ import java.net.http.HttpResponse;
 public class EmptyResponseProcessor implements ResponseProcessor {
 
     @Override
-    public <T> HttpResponse<T> processResponse(HttpResponse<T> response) throws SylphHttpResponseException {
-        return response;
+    public <T> void processResponse(HttpResponse<T> response) throws SylphHttpResponseException {
     }
 
 }

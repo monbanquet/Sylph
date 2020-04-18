@@ -38,18 +38,14 @@ public class DefaultResponseProcessor implements ResponseProcessor {
     }
 
     @Override
-    public <T> HttpResponse<T> processResponse(HttpResponse<T> response) throws SylphHttpResponseException {
-        if (response.statusCode() < 300) {
-            return response;
-
-        } else {
+    public <T> void processResponse(HttpResponse<T> response) throws SylphHttpResponseException {
+        if (response.statusCode() >= 300) {
             String requestUri = response.request().uri().toString();
             String requestMethod = response.request().method();
             int responseCode = response.statusCode();
             String errorBody = response.body() instanceof String ? (String) response.body() : "";
             log.error("Error while executing call {} {} : responseCode={}, errorBody={}",
                     requestMethod, requestUri, responseCode, errorBody);
-
             throw new SylphHttpResponseException(requestUri, requestMethod, responseCode, errorBody);
         }
     }

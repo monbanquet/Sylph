@@ -52,7 +52,7 @@ public class DefaultRequestLogger implements RequestLogger {
     }
 
     @Override
-    public HttpRequest log(HttpRequest request) {
+    public void log(HttpRequest request) {
         if (level.isEnabled(logger)) {
             String requestHeaders = request.headers().map().entrySet().stream()
                     .map(entry -> entry.getKey() + ":" + entry.getValue())
@@ -62,6 +62,5 @@ public class DefaultRequestLogger implements RequestLogger {
             }
             level.prepare(logger).log(" - Request {} {}", request.method(), request.uri());
         }
-        return request;
     }
 }

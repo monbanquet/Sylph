@@ -51,7 +51,7 @@ public class DefaultResponseLogger implements ResponseLogger {
         return new DefaultResponseLogger(level);
     }
 
-    public <T> HttpResponse<T> log(HttpResponse<T> response) {
+    public <T> void log(HttpResponse<T> response) {
         if (level.isEnabled(logger)) {
             String responseHeader = response.headers().map().entrySet().stream()
                     .map(entry -> entry.getKey() + ":" + entry.getValue())
@@ -62,7 +62,6 @@ public class DefaultResponseLogger implements ResponseLogger {
             level.prepare(logger).log(" - Response Status Code: {}", response.statusCode());
             level.prepare(logger).log(" - Response Body : {}", response.body());
         }
-        return response;
     }
 
 }
